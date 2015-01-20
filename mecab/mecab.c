@@ -1793,8 +1793,24 @@ php_mecab_check_path(const char *path, size_t length, char *real_path TSRMLS_DC)
 {
 	char *full_path;
 
-	if (strlen(path) != length ||
-		(full_path = expand_filepath(path, real_path TSRMLS_CC)) == NULL)
+	if (strlen(path) != length)
+	{
+		return 0;
+	}
+
+	if (strchr(path, ',') != NULL) /* multiple paths */
+	{
+		/* don't expand paths or changes will be huge for such a small thing */
+		if (real_path != NULL) {
+			if (length >= PATHBUFSIZE) { /* XXX: assuming buffer size */
+				return 0;
+			}
+			strcpy(real_path, path);
+		}
+		return 1;
+	}
+
+	if ((full_path = expand_filepath(path, real_path TSRMLS_CC)) == NULL)
 	{
 		return 0;
 	}
