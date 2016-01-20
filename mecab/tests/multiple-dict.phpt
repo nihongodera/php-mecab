@@ -22,7 +22,7 @@ for ($i = 0; $i < 2; $i++) {
 }
 unlink($userDicTextPath);
 
-$mecab = new Mecab(['-u', implode(',', $userDicPaths)]);
+$mecab = new \Mecab\Tagger(['-u', implode(',', $userDicPaths)]);
 $out = $mecab->parseToString("辞書");
 echo (strpos($out, "テスト") !== false) ? 'OK' : 'Parse error: ' . $out;
 foreach ($userDicPaths as $userDicPath) {
