@@ -1,7 +1,7 @@
 /**
  * The MeCab PHP extension
  *
- * Copyright (c) 2006-2012 Ryusuke SEKIYAMA. All rights reserved.
+ * Copyright (c) 2006-2015 Ryusuke SEKIYAMA. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -23,9 +23,9 @@
  *
  * @package     php-mecab
  * @author      Ryusuke SEKIYAMA <rsky0711@gmail.com>
- * @copyright   2006-2012 Ryusuke SEKIYAMA
+ * @copyright   2006-2015 Ryusuke SEKIYAMA
  * @license     http://www.opensource.org/licenses/mit-license.php  MIT License
- * @version     SVN: $Id$
+ * @version     $Id$
  */
 
 #ifndef PHP_MECAB_H
@@ -37,12 +37,6 @@ extern "C" {
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
-
-#if PHP_MECAB_VERSION_NUMBER == 99 || PHP_MECAB_VERSION_NUMBER >= 990
-#define PHP_MECAB_99X 1
-#else
-#define PHP_MECAB_99X 0
 #endif
 
 #include <php.h>
@@ -68,7 +62,7 @@ extern "C" {
 #include "TSRM.h"
 #endif
 
-#define PHP_MECAB_MODULE_VERSION "0.5.0"
+#define PHP_MECAB_MODULE_VERSION "0.6.0"
 
 #ifndef PHP_MECAB_VERSION_NUMBER
 #define PHP_MECAB_VERSION_NUMBER 0
@@ -78,12 +72,6 @@ extern "C" {
 #endif
 
 #define FREE_RESOURCE(resource) zend_list_delete(Z_RESVAL_P(resource))
-
-#if PHP_VERSION_ID >= 50300
-#define IS_CALLABLE_TSRMLS_CC TSRMLS_CC
-#else
-#define IS_CALLABLE_TSRMLS_CC
-#endif
 
 /* {{{ module globals */
 
@@ -123,9 +111,6 @@ enum _php_mecab_node_attribute {
 	ATTR_CHAR_TYPE,
 	ATTR_STAT,
 	ATTR_ISBEST,
-#if !PHP_MECAB_99X
-	ATTR_SENTENCE_LENGTH,
-#endif
 	ATTR_ALPHA,
 	ATTR_BETA,
 	ATTR_PROB,
@@ -151,8 +136,12 @@ enum _php_mecab_path_rel {
 
 struct _php_mecab {
 	mecab_t *ptr;
+#if PHP_VERSION_ID >= 70000
+	zend_string *str;
+#else
 	char *str;
 	int len;
+#endif
 	int ref;
 };
 
