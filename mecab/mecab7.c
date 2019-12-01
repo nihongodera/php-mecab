@@ -1337,10 +1337,10 @@ static PHP_FUNCTION(split)
 	zend_string *str = NULL;
 	zend_string *zdicdir = NULL;
 	const char *dicdir = NULL;
-	int dicdir_len = 0;
+	size_t dicdir_len = 0;
 	zend_string *zuserdic = NULL;
 	const char *userdic = NULL;
-	int userdic_len = 0;
+	size_t userdic_len = 0;
 
 	/* local variables */
 	mecab_t *mecab = NULL;
@@ -1362,14 +1362,14 @@ static PHP_FUNCTION(split)
 		dicdir_len = ZSTR_LEN(zdicdir);
 	} else if (PHP_MECAB_CHECK_DEFAULT(dicdir)) {
 		dicdir = MECAB_G(default_dicdir);
-		dicdir_len = (int)strlen(MECAB_G(default_dicdir));
+		dicdir_len = strlen(MECAB_G(default_dicdir));
 	}
 	if (zuserdic != NULL && ZSTR_LEN(zuserdic) > 0) {
 		userdic = ZSTR_VAL(zuserdic);
 		userdic_len = ZSTR_LEN(zuserdic);
 	} else if (PHP_MECAB_CHECK_DEFAULT(userdic)) {
 		userdic = MECAB_G(default_userdic);
-		userdic_len = (int)strlen(MECAB_G(default_userdic));
+		userdic_len = strlen(MECAB_G(default_userdic));
 	}
 
 	/* check for dictionary */
