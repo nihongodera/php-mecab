@@ -1472,7 +1472,7 @@ static PHP_FUNCTION(mecab_new)
 	if (zoptions != NULL) {
 		int getopt_result = 0;
 		zend_string *key;
-		ulong num_key;
+		zend_ulong num_key;
 		zval *entry;
 
 		ALLOC_HASHTABLE(options);
