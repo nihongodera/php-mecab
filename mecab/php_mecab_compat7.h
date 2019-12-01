@@ -4,6 +4,8 @@
 #ifndef PHP_MECAB_COMPAT_H
 #define PHP_MECAB_COMPAT_H
 
+#define MSVC_VA_EXPAND(args) args
+
 #define PHP_MECAB_INTERNAL_RSRC_FROM_PARAMETER() { \
 	if (ZEND_NUM_ARGS() != 0) { \
 		WRONG_PARAM_COUNT; \
@@ -56,7 +58,7 @@
 		const php_mecab_##name##_object *intern = php_mecab_##name##_object_fetch_object(Z_OBJ_P(getThis())); \
 		const php_mecab_##name *x##name = intern->ptr; \
 		const mecab_##name##_t *name = x##name->ptr; \
-		RETURN_##type(__VA_ARGS__); \
+		MSVC_VA_EXPAND(RETURN_##type(__VA_ARGS__)); \
 	} \
 }
 
