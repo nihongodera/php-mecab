@@ -79,4 +79,13 @@
 #define PHP_MECAB_REGISTER_NS_CONSTANT(name) \
 	REGISTER_NS_LONG_CONSTANT("MeCab", #name, MECAB_##name, CONST_PERSISTENT | CONST_CS)
 
+/* PHP < 8.1 */
+#ifndef ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_INFO_EX
+#define ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_INFO_EX(name, return_ref, req_num_args, type, allow_null) \
+	ZEND_BEGIN_ARG_INFO_EX(name, 0, return_ref, req_num_args)
+
+#define ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_OBJ_INFO_EX(name, return_ref, req_num_args, class_name, allow_null) \
+	ZEND_BEGIN_ARG_INFO_EX(name, ZEND_SEND_BY_VAL, return_ref, req_num_args)
+#endif
+
 #endif /* PHP_MECAB_COMPAT_H */
