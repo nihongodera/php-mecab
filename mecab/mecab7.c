@@ -30,6 +30,11 @@
 
 #include "php_mecab.h"
 #include "php_mecab_compat7.h"
+#if PHP_VERSION_ID >= 80000
+#include "mecab_arginfo.h"
+#else
+#include "mecab_legacy_arginfo.h"
+#endif
 
 #define PATHBUFSIZE (MAXPATHLEN + 3)
 
@@ -69,84 +74,7 @@ static PHP_GINIT_FUNCTION(mecab);
 
 /* {{{ PHP function prototypes */
 
-/* Get MeCab library version */
-static PHP_FUNCTION(version);
-/* Wakati-Gaki function */
-static PHP_FUNCTION(split);
-/* MeCab API wrappers */
 static PHP_FUNCTION(mecab_new);
-static PHP_FUNCTION(mecab_get_partial);
-static PHP_FUNCTION(mecab_set_partial);
-static PHP_FUNCTION(mecab_get_theta);
-static PHP_FUNCTION(mecab_set_theta);
-static PHP_FUNCTION(mecab_get_lattice_level);
-static PHP_FUNCTION(mecab_set_lattice_level);
-static PHP_FUNCTION(mecab_get_all_morphs);
-static PHP_FUNCTION(mecab_set_all_morphs);
-static PHP_FUNCTION(mecab_sparse_tostr);
-static PHP_FUNCTION(mecab_sparse_tonode);
-static PHP_FUNCTION(mecab_nbest_sparse_tostr);
-static PHP_FUNCTION(mecab_nbest_init);
-static PHP_FUNCTION(mecab_nbest_next_tostr);
-static PHP_FUNCTION(mecab_nbest_next_tonode);
-static PHP_FUNCTION(mecab_format_node);
-static PHP_FUNCTION(mecab_dictionary_info);
-/* Dumper for mecab_node */
-static PHP_FUNCTION(mecab_node_toarray);
-static PHP_FUNCTION(mecab_node_tostring);
-/* Getters for mecab_node */
-static PHP_FUNCTION(mecab_node_prev);
-static PHP_FUNCTION(mecab_node_next);
-static PHP_FUNCTION(mecab_node_enext);
-static PHP_FUNCTION(mecab_node_bnext);
-static PHP_FUNCTION(mecab_node_rpath);
-static PHP_FUNCTION(mecab_node_lpath);
-static PHP_FUNCTION(mecab_node_surface);
-static PHP_FUNCTION(mecab_node_feature);
-static PHP_FUNCTION(mecab_node_id);
-static PHP_FUNCTION(mecab_node_length);
-static PHP_FUNCTION(mecab_node_rlength);
-static PHP_FUNCTION(mecab_node_rcattr);
-static PHP_FUNCTION(mecab_node_lcattr);
-static PHP_FUNCTION(mecab_node_posid);
-static PHP_FUNCTION(mecab_node_char_type);
-static PHP_FUNCTION(mecab_node_stat);
-static PHP_FUNCTION(mecab_node_isbest);
-static PHP_FUNCTION(mecab_node_alpha);
-static PHP_FUNCTION(mecab_node_beta);
-static PHP_FUNCTION(mecab_node_prob);
-static PHP_FUNCTION(mecab_node_wcost);
-static PHP_FUNCTION(mecab_node_cost);
-/* Getters for mecab_path */
-static PHP_FUNCTION(mecab_path_rnext);
-static PHP_FUNCTION(mecab_path_lnext);
-static PHP_FUNCTION(mecab_path_rnode);
-static PHP_FUNCTION(mecab_path_lnode);
-static PHP_FUNCTION(mecab_path_prob);
-static PHP_FUNCTION(mecab_path_cost);
-
-/* }}} */
-
-/* {{{ PHP method prototypes */
-
-static PHP_METHOD(MeCab_Node, __construct);
-static PHP_METHOD(MeCab_Path, __construct);
-/* Overloading implementations for mecab_node */
-static PHP_METHOD(MeCab_Node, __get);
-static PHP_METHOD(MeCab_Node, __isset);
-/* IteratorAggregate implementations for mecab_node */
-static PHP_METHOD(MeCab_Node, getIterator);
-static PHP_METHOD(MeCab_Node, setTraverse);
-/* Iterator implementations for mecab_node */
-static PHP_METHOD(MeCab_NodeIterator, __construct);
-static PHP_METHOD(MeCab_NodeIterator, current);
-static PHP_METHOD(MeCab_NodeIterator, key);
-static PHP_METHOD(MeCab_NodeIterator, valid);
-static PHP_METHOD(MeCab_NodeIterator, rewind);
-static PHP_METHOD(MeCab_NodeIterator, next);
-/* Overloading implementations for mecab_path */
-static PHP_METHOD(MeCab_Path, __get);
-static PHP_METHOD(MeCab_Path, __isset);
 
 /* }}} */
 
@@ -265,333 +193,6 @@ php_mecab_check_path(const char *path, size_t length, char *real_path);
 
 /* }}} */
 
-/* {{{ argument informations */
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_mecab_version, ZEND_RETURN_VALUE, 0, IS_STRING, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_split, ZEND_SEND_BY_VAL, ZEND_RETURN_VALUE, 1)
-	ZEND_ARG_INFO(0, str)
-	ZEND_ARG_INFO(0, dicdir)
-	ZEND_ARG_INFO(0, userdic)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_new, ZEND_SEND_BY_VAL, ZEND_RETURN_VALUE, 0)
-	ZEND_ARG_ARRAY_INFO(0, arg, 1)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_mecab_get_partial_m, ZEND_RETURN_VALUE, 0, _IS_BOOL, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_set_partial_m, ZEND_SEND_BY_VAL, ZEND_RETURN_VALUE, 0)
-	ZEND_ARG_INFO(0, partial)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_set_theta_m, ZEND_SEND_BY_VAL, ZEND_RETURN_VALUE, 0)
-	ZEND_ARG_INFO(0, theta)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_set_lattice_level_m, ZEND_SEND_BY_VAL, ZEND_RETURN_VALUE, 0)
-	ZEND_ARG_INFO(0, level)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_set_all_morphs_m, ZEND_SEND_BY_VAL, ZEND_RETURN_VALUE, 0)
-	ZEND_ARG_INFO(0, all_morphs)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_sparse_tostr_m, ZEND_SEND_BY_VAL, ZEND_RETURN_VALUE, 1)
-	ZEND_ARG_INFO(0, str)
-	ZEND_ARG_INFO(0, len)
-	ZEND_ARG_INFO(0, olen)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_sparse_tonode_m, ZEND_SEND_BY_VAL, ZEND_RETURN_VALUE, 1)
-	ZEND_ARG_INFO(0, str)
-	ZEND_ARG_INFO(0, len)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_nbest_sparse_tostr_m, ZEND_SEND_BY_VAL, ZEND_RETURN_VALUE, 2)
-	ZEND_ARG_INFO(0, n)
-	ZEND_ARG_INFO(0, str)
-	ZEND_ARG_INFO(0, len)
-	ZEND_ARG_INFO(0, olen)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_nbest_init_m, ZEND_SEND_BY_VAL, ZEND_RETURN_VALUE, 1)
-	ZEND_ARG_INFO(0, str)
-	ZEND_ARG_INFO(0, len)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_nbest_next_tostr_m, ZEND_SEND_BY_VAL, ZEND_RETURN_VALUE, 0)
-	ZEND_ARG_INFO(0, olen)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_format_node_m, ZEND_SEND_BY_VAL, ZEND_RETURN_VALUE, 1)
-	ZEND_ARG_OBJ_INFO(0, node, MeCab\\Node, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_node_toarray_m, ZEND_SEND_BY_VAL, ZEND_RETURN_VALUE, 0)
-	ZEND_ARG_INFO(0, dump_all)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_OBJ_INFO_EX(arginfo_mecab_getIterator, ZEND_RETURN_VALUE, 0, Traversable, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_node_settraverse, ZEND_SEND_BY_VAL, ZEND_RETURN_VALUE, 1)
-	ZEND_ARG_INFO(0, traverse)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab__construct, ZEND_SEND_BY_VAL, ZEND_RETURN_VALUE, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab__magic_getter, ZEND_SEND_BY_VAL, ZEND_RETURN_VALUE, 1)
-	ZEND_ARG_INFO(0, name)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_mecab_get_theta_m, ZEND_RETURN_VALUE, 0, IS_DOUBLE, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_mecab_get_lattice_level_m, ZEND_RETURN_VALUE, 0, IS_LONG, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_mecab_get_all_morphs_m, ZEND_RETURN_VALUE, 0, _IS_BOOL, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_mecab_nbest_next_tonode_m, ZEND_RETURN_VALUE, 0, _IS_BOOL | IS_OBJECT, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_mecab_dictionary_info_m, ZEND_RETURN_VALUE, 0, IS_NULL | IS_ARRAY, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_INFO_EX(arginfo_mecab_node_tostring_m, ZEND_RETURN_VALUE, 0, IS_STRING, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_node_prev_m, 0, 0, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_node_next_m, 0, 0, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_node_enext_m, 0, 0, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_node_bnext_m, 0, 0, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_node_rpath_m, 0, 0, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_node_lpath_m, 0, 0, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_node_surface_m, 0, 0, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_node_feature_m, 0, 0, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_node_id_m, 0, 0, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_node_length_m, 0, 0, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_node_rlength_m, 0, 0, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_node_rcattr_m, 0, 0, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_node_lcattr_m, 0, 0, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_node_posid_m, 0, 0, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_node_char_type_m, 0, 0, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_node_stat_m, 0, 0, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_node_isbest_m, 0, 0, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_node_alpha_m, 0, 0, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_node_beta_m, 0, 0, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_node_prob_m, 0, 0, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_node_wcost_m, 0, 0, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_node_cost_m, 0, 0, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_nodeiterator___construct_m, 0, 0, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_INFO_EX(arginfo_mecab_nodeiterator_current_m, 0, 0, IS_MIXED, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_INFO_EX(arginfo_mecab_nodeiterator_key_m, 0, 0, IS_MIXED, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_INFO_EX(arginfo_mecab_nodeiterator_next_m, 0, 0, IS_VOID, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_INFO_EX(arginfo_mecab_nodeiterator_rewind_m, 0, 0, IS_VOID, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_INFO_EX(arginfo_mecab_nodeiterator_valid_m, 0, 0, _IS_BOOL, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_path_rnext_m, 0, 0, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_path_lnext_m, 0, 0, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_path_rnode_m, 0, 0, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_path_lnode_m, 0, 0, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_path_prob_m, 0, 0, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mecab_path_cost_m, 0, 0, 0)
-ZEND_END_ARG_INFO()
-
-/* }}} arginfo */
-
-/* {{{ MeCab\Tagger methods[] */
-
-#define PM_TAGGER_ME_MAPPING(methname, funcname) \
-	PHP_ME_MAPPING(methname, mecab_ ## funcname, arginfo_mecab_ ## funcname ## _m, ZEND_ACC_PUBLIC)
-
-static zend_function_entry mecab_methods[] = {
-	/* MeCab API wrappers */
-	PHP_ME_MAPPING(__construct, mecab_new,   arginfo_mecab_new,   ZEND_ACC_PUBLIC | ZEND_ACC_CTOR)
-	PM_TAGGER_ME_MAPPING(getPartial,      get_partial)
-	PM_TAGGER_ME_MAPPING(setPartial,      set_partial)
-	PM_TAGGER_ME_MAPPING(getTheta,        get_theta)
-	PM_TAGGER_ME_MAPPING(setTheta,        set_theta)
-	PM_TAGGER_ME_MAPPING(getLatticeLevel, get_lattice_level)
-	PM_TAGGER_ME_MAPPING(setLatticeLevel, set_lattice_level)
-	PM_TAGGER_ME_MAPPING(getAllMorphs,    get_all_morphs)
-	PM_TAGGER_ME_MAPPING(setAllMorphs,    set_all_morphs)
-	PM_TAGGER_ME_MAPPING(parse,           sparse_tostr)
-	PM_TAGGER_ME_MAPPING(parseToString,   sparse_tostr)
-	PM_TAGGER_ME_MAPPING(parseToNode,     sparse_tonode)
-	PM_TAGGER_ME_MAPPING(parseNBest,      nbest_sparse_tostr)
-	PM_TAGGER_ME_MAPPING(parseNBestInit,  nbest_init)
-	PM_TAGGER_ME_MAPPING(next,            nbest_next_tostr)
-	PM_TAGGER_ME_MAPPING(nextNode,        nbest_next_tonode)
-	PM_TAGGER_ME_MAPPING(formatNode,      format_node)
-	PM_TAGGER_ME_MAPPING(dictionaryInfo,  dictionary_info)
-	PHP_FE_END
-};
-/* }}} */
-
-/* {{{ MeCab\Node methods[] */
-#define PM_NODE_ME_MAPPING(methname, funcname) \
-	PHP_ME_MAPPING(methname, mecab_node_ ## funcname, arginfo_mecab_node_ ## funcname ## _m, ZEND_ACC_PUBLIC)
-
-static zend_function_entry mecab_node_methods[] = {
-	/* Constructor */
-	PHP_ME(MeCab_Node, __construct, arginfo_mecab__construct, ZEND_ACC_PRIVATE | ZEND_ACC_CTOR)
-	/* Overloading implementations */
-	PHP_ME(MeCab_Node, __get,   arginfo_mecab__magic_getter, ZEND_ACC_PUBLIC)
-	PHP_ME(MeCab_Node, __isset, arginfo_mecab__magic_getter, ZEND_ACC_PUBLIC)
-	/* IteratorAggregate implementations */
-	PHP_ME(MeCab_Node, getIterator, arginfo_mecab_getIterator, ZEND_ACC_PUBLIC)
-	PHP_ME(MeCab_Node, setTraverse, arginfo_mecab_node_settraverse, ZEND_ACC_PUBLIC)
-	/* Dumper */
-	PHP_ME_MAPPING(toArray, mecab_node_toarray, arginfo_mecab_node_toarray_m, ZEND_ACC_PUBLIC)
-	PM_NODE_ME_MAPPING(toString, tostring)
-	PM_NODE_ME_MAPPING(__toString, tostring)
-	/* Getters */
-	PM_NODE_ME_MAPPING(getPrev,     prev)
-	PM_NODE_ME_MAPPING(getNext,     next)
-	PM_NODE_ME_MAPPING(getENext,    enext)
-	PM_NODE_ME_MAPPING(getBNext,    bnext)
-	PM_NODE_ME_MAPPING(getRPath,    rpath)
-	PM_NODE_ME_MAPPING(getLPath,    lpath)
-	PM_NODE_ME_MAPPING(getSurface,  surface)
-	PM_NODE_ME_MAPPING(getFeature,  feature)
-	PM_NODE_ME_MAPPING(getId,       id)
-	PM_NODE_ME_MAPPING(getLength,   length)
-	PM_NODE_ME_MAPPING(getRLength,  rlength)
-	PM_NODE_ME_MAPPING(getRcAttr,   rcattr)
-	PM_NODE_ME_MAPPING(getLcAttr,   lcattr)
-	PM_NODE_ME_MAPPING(getPosId,    posid)
-	PM_NODE_ME_MAPPING(getCharType, char_type)
-	PM_NODE_ME_MAPPING(getStat,     stat)
-	PM_NODE_ME_MAPPING(isBest,      isbest)
-	PM_NODE_ME_MAPPING(getAlpha,    alpha)
-	PM_NODE_ME_MAPPING(getBeta,     beta)
-	PM_NODE_ME_MAPPING(getProb,     prob)
-	PM_NODE_ME_MAPPING(getWCost,    wcost)
-	PM_NODE_ME_MAPPING(getCost,     cost)
-	PHP_FE_END
-};
-/* }}} */
-
-#define PM_NODEITERATOR_ME(methname, funcname, acc) \
-	PHP_ME(methname, funcname, arginfo_mecab_nodeiterator_ ## funcname ## _m, acc)
-
-/* {{{ MeCab_NodeIterator methods[] */
-static zend_function_entry mecab_iterator_methods[] = {
-	/* Constructor */
-	PM_NODEITERATOR_ME(MeCab_NodeIterator, __construct, ZEND_ACC_PRIVATE | ZEND_ACC_CTOR)
-	/* Iterator implementations */
-	PM_NODEITERATOR_ME(MeCab_NodeIterator,  current,    ZEND_ACC_PUBLIC)
-	PM_NODEITERATOR_ME(MeCab_NodeIterator,  key,        ZEND_ACC_PUBLIC)
-	PM_NODEITERATOR_ME(MeCab_NodeIterator,  next,       ZEND_ACC_PUBLIC)
-	PM_NODEITERATOR_ME(MeCab_NodeIterator,  rewind,     ZEND_ACC_PUBLIC)
-	PM_NODEITERATOR_ME(MeCab_NodeIterator,  valid,      ZEND_ACC_PUBLIC)
-	PHP_FE_END
-};
-/* }}} */
-
-/* {{{ MeCab\Path methods[] */
-#define PM_PATH_ME_MAPPING(methname, funcname) \
-	PHP_ME_MAPPING(methname, mecab_path_ ## funcname, arginfo_mecab_path_ ## funcname ## _m, ZEND_ACC_PUBLIC)
-
-static zend_function_entry mecab_path_methods[] = {
-	/* Constructor */
-	PHP_ME(MeCab_Path, __construct, arginfo_mecab__construct, ZEND_ACC_PRIVATE | ZEND_ACC_CTOR)
-	/* Overloading implementations */
-	PHP_ME(MeCab_Path, __get,   arginfo_mecab__magic_getter, ZEND_ACC_PUBLIC)
-	PHP_ME(MeCab_Path, __isset, arginfo_mecab__magic_getter, ZEND_ACC_PUBLIC)
-	/* Getters */
-	PM_PATH_ME_MAPPING(getRNext, rnext)
-	PM_PATH_ME_MAPPING(getLNext, lnext)
-	PM_PATH_ME_MAPPING(getRNode, rnode)
-	PM_PATH_ME_MAPPING(getLNode, lnode)
-	PM_PATH_ME_MAPPING(getProb, prob)
-	PM_PATH_ME_MAPPING(getCost, cost)
-	PHP_FE_END
-};
-/* }}} methods */
-
-/* }}} class definitions */
-
-/* {{{ mecab_functions[] */
-
-static zend_function_entry mecab_functions[] = {
-	ZEND_NS_FE("MeCab", version, arginfo_mecab_version)
-	ZEND_NS_FE("MeCab", split, arginfo_mecab_split)
-	PHP_FE_END
-};
-/* }}} */
-
 /* {{{ cross-extension dependencies */
 
 static zend_module_dep mecab_deps[] = {
@@ -607,7 +208,7 @@ zend_module_entry mecab_module_entry = {
 	NULL,
 	mecab_deps,
 	"mecab",
-	mecab_functions,
+	ext_functions,
 	PHP_MINIT(mecab),
 	PHP_MSHUTDOWN(mecab),
 	NULL,
@@ -667,13 +268,7 @@ static PHP_MINIT_FUNCTION(mecab)
 		return FAILURE;
 	}
 	{
-		zend_class_entry ce1;
-
-		INIT_NS_CLASS_ENTRY(ce1, "MeCab", "Tagger", mecab_methods);
-		ce_MeCab_Tagger = zend_register_internal_class(&ce1);
-		if (!ce_MeCab_Tagger) {
-			return FAILURE;
-		}
+		ce_MeCab_Tagger = register_class_MeCab_Tagger();
 		ce_MeCab_Tagger->create_object = php_mecab_object_new;
 
 		memcpy(&php_mecab_object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
@@ -682,29 +277,16 @@ static PHP_MINIT_FUNCTION(mecab)
 		php_mecab_object_handlers.offset = XtOffsetOf(php_mecab_object, std);
 	}
 	{
-		zend_class_entry ce2, ce2i;
-
-		INIT_NS_CLASS_ENTRY(ce2, "MeCab", "Node", mecab_node_methods);
-		ce_MeCab_Node = zend_register_internal_class(&ce2);
-		if (!ce_MeCab_Node) {
-			return FAILURE;
-		}
-		ce_MeCab_Node->create_object = php_mecab_node_object_new;
-
-		INIT_NS_CLASS_ENTRY(ce2i, "MeCab", "NodeIterator", mecab_iterator_methods);
-		ce_MeCab_NodeIterator = zend_register_internal_class(&ce2i);
-		if (!ce_MeCab_NodeIterator) {
-			return FAILURE;
-		}
+		ce_MeCab_NodeIterator = register_class_MeCab_NodeIterator(ext_ce_Iterator);
 		ce_MeCab_NodeIterator->create_object = php_mecab_node_object_new;
+
+		ce_MeCab_Node = register_class_MeCab_Node(ext_ce_IteratorAggregate);
+		ce_MeCab_Node->create_object = php_mecab_node_object_new;
 
 		memcpy(&php_mecab_node_object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
 		php_mecab_node_object_handlers.clone_obj = NULL;
 		php_mecab_node_object_handlers.free_obj = php_mecab_node_free_object_storage;
 		php_mecab_node_object_handlers.offset = XtOffsetOf(php_mecab_node_object, std);
-
-		zend_class_implements(ce_MeCab_Node, 1, ext_ce_IteratorAggregate);
-		zend_class_implements(ce_MeCab_NodeIterator, 1, ext_ce_Iterator);
 
 		zend_declare_class_constant_long(ce_MeCab_Node, "NOR", 3, MECAB_NOR_NODE);
 		zend_declare_class_constant_long(ce_MeCab_Node, "UNK", 3, MECAB_UNK_NODE);
@@ -716,13 +298,7 @@ static PHP_MINIT_FUNCTION(mecab)
 		zend_declare_class_constant_long(ce_MeCab_Node, "TRAVERSE_BNEXT", 14, (long)TRAVERSE_BNEXT);
 	}
 	{
-		zend_class_entry ce3;
-
-		INIT_NS_CLASS_ENTRY(ce3, "MeCab", "Path", mecab_path_methods);
-		ce_MeCab_Path = zend_register_internal_class(&ce3);
-		if (!ce_MeCab_Path) {
-			return FAILURE;
-		}
+		ce_MeCab_Path = register_class_MeCab_Path();
 		ce_MeCab_Path->create_object = php_mecab_path_object_new;
 
 		memcpy(&php_mecab_path_object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
@@ -1446,7 +1022,7 @@ php_mecab_check_option(const char *option)
  *
  * @return	string	The version of linked MeCab library.
  */
-static PHP_FUNCTION(version)
+PHP_FUNCTION(MeCab_version)
 {
 	if (ZEND_NUM_ARGS() != 0) {
 		WRONG_PARAM_COUNT;
@@ -1464,7 +1040,7 @@ static PHP_FUNCTION(version)
  * @param	string	$userdic	The path for user dictionary.
  * @return	array
  */
-static PHP_FUNCTION(split)
+PHP_FUNCTION(MeCab_split)
 {
 	/* variables from argument */
 	zend_string *str = NULL;
@@ -1574,7 +1150,7 @@ static PHP_FUNCTION(split)
  *								The detail is found in the web site and/or the manpage of MeCab.
  * @return	resource mecab	A tagger resource of MeCab.
  */
-static PHP_FUNCTION(mecab_new)
+PHP_METHOD(MeCab_Tagger, __construct)
 {
 	/* declaration of the resources */
 	php_mecab *xmecab = NULL;
@@ -1742,7 +1318,7 @@ static PHP_FUNCTION(mecab_new)
  * @param	resource mecab	$mecab	The tagger resource of MeCab.
  * @return	bool
  */
-static PHP_FUNCTION(mecab_get_partial)
+PHP_METHOD(MeCab_Tagger, getPartial)
 {
 	/* declaration of the resources */
 	php_mecab *xmecab = NULL;
@@ -1766,7 +1342,7 @@ static PHP_FUNCTION(mecab_get_partial)
  * @param	bool	$partial	The partial parsing mode.
  * @return	void
  */
-static PHP_FUNCTION(mecab_set_partial)
+PHP_METHOD(MeCab_Tagger, setPartial)
 {
 	/* declaration of the resources */
 	php_mecab *xmecab = NULL;
@@ -1792,7 +1368,7 @@ static PHP_FUNCTION(mecab_set_partial)
  * @param	resource mecab	$mecab	The tagger resource of MeCab.
  * @return	float
  */
-static PHP_FUNCTION(mecab_get_theta)
+PHP_METHOD(MeCab_Tagger, getTheta)
 {
 	/* declaration of the resources */
 	php_mecab *xmecab = NULL;
@@ -1816,7 +1392,7 @@ static PHP_FUNCTION(mecab_get_theta)
  * @param	float	$theta	The temparature parameter theta.
  * @return	void
  */
-static PHP_FUNCTION(mecab_set_theta)
+PHP_METHOD(MeCab_Tagger, setTheta)
 {
 	/* declaration of the resources */
 	php_mecab *xmecab = NULL;
@@ -1842,7 +1418,7 @@ static PHP_FUNCTION(mecab_set_theta)
  * @param	resource mecab	$mecab	The tagger resource of MeCab.
  * @return	int
  */
-static PHP_FUNCTION(mecab_get_lattice_level)
+PHP_METHOD(MeCab_Tagger, getLatticeLevel)
 {
 	/* declaration of the resources */
 	php_mecab *xmecab = NULL;
@@ -1866,7 +1442,7 @@ static PHP_FUNCTION(mecab_get_lattice_level)
  * @param	int	$level	The lattice information level.
  * @return	void
  */
-static PHP_FUNCTION(mecab_set_lattice_level)
+PHP_METHOD(MeCab_Tagger, setLatticeLevel)
 {
 	/* declaration of the resources */
 	php_mecab *xmecab = NULL;
@@ -1892,7 +1468,7 @@ static PHP_FUNCTION(mecab_set_lattice_level)
  * @param	resource mecab	$mecab	The tagger resource of MeCab.
  * @return	bool
  */
-static PHP_FUNCTION(mecab_get_all_morphs)
+PHP_METHOD(MeCab_Tagger, getAllMorphs)
 {
 	/* declaration of the resources */
 	php_mecab *xmecab = NULL;
@@ -1916,7 +1492,7 @@ static PHP_FUNCTION(mecab_get_all_morphs)
  * @param	bool	$all_morphs	The all morphs mode.
  * @return	void
  */
-static PHP_FUNCTION(mecab_set_all_morphs)
+PHP_METHOD(MeCab_Tagger, setAllMorphs)
 {
 	/* declaration of the resources */
 	php_mecab *xmecab = NULL;
@@ -1947,7 +1523,7 @@ static PHP_FUNCTION(mecab_set_all_morphs)
  * @return	string	The parse result.
  *					If output buffer has overflowed, returns false.
  */
-static PHP_FUNCTION(mecab_sparse_tostr)
+PHP_METHOD(MeCab_Tagger, parse)
 {
 	/* declaration of the resources */
 	php_mecab *xmecab = NULL;
@@ -2004,7 +1580,7 @@ static PHP_FUNCTION(mecab_sparse_tostr)
  * @param	int	$len	The maximum length that can be analyzed. (optional)
  * @return	resource mecab_node	The result node of given string.
  */
-static PHP_FUNCTION(mecab_sparse_tonode)
+PHP_METHOD(MeCab_Tagger, parseToNode)
 {
 	/* declaration of the resources */
 	php_mecab *xmecab = NULL;
@@ -2058,7 +1634,7 @@ static PHP_FUNCTION(mecab_sparse_tonode)
  * @return	string	The N-Best list.
  *					If output buffer has overflowed, returns false.
  */
-static PHP_FUNCTION(mecab_nbest_sparse_tostr)
+PHP_METHOD(MeCab_Tagger, parseNBest)
 {
 	/* declaration of the resources */
 	php_mecab *xmecab = NULL;
@@ -2116,7 +1692,7 @@ static PHP_FUNCTION(mecab_nbest_sparse_tostr)
  * @param	int	$len	The maximum length that can be analyzed. (optional)
  * @return	bool	True if succeeded to initilalize, otherwise returns false.
  */
-static PHP_FUNCTION(mecab_nbest_init)
+PHP_METHOD(MeCab_Tagger, parseNBestInit)
 {
 	/* declaration of the resources */
 	php_mecab *xmecab = NULL;
@@ -2158,7 +1734,7 @@ static PHP_FUNCTION(mecab_nbest_init)
  *					If there are no more results, returns false.
  *					Also returns false if output buffer has overflowed.
  */
-static PHP_FUNCTION(mecab_nbest_next_tostr)
+PHP_METHOD(MeCab_Tagger, next)
 {
 	/* declaration of the resources */
 	php_mecab *xmecab = NULL;
@@ -2214,7 +1790,7 @@ static PHP_FUNCTION(mecab_nbest_next_tostr)
  * @return	resource mecab_node	The result node of the next pointer.
  *								If there are no more results, returns false.
  */
-static PHP_FUNCTION(mecab_nbest_next_tonode)
+PHP_METHOD(MeCab_Tagger, nextNode)
 {
 	/* declaration of the resources */
 	php_mecab *xmecab = NULL;
@@ -2266,7 +1842,7 @@ static PHP_FUNCTION(mecab_nbest_next_tonode)
  * @return	string	The formatted string.
  * @see	mecab_node_tostring
  */
-static PHP_FUNCTION(mecab_format_node)
+PHP_METHOD(MeCab_Tagger, formatNode)
 {
 	/* declaration of the resources */
 	zval *node_object = NULL;
@@ -2313,7 +1889,7 @@ static PHP_FUNCTION(mecab_format_node)
  *
  * @return	array	The information of the dictionary.
  */
-static PHP_FUNCTION(mecab_dictionary_info)
+PHP_METHOD(MeCab_Tagger, dictionaryInfo)
 {
 	/* declaration of the resources */
 	php_mecab *xmecab = NULL;
@@ -2364,7 +1940,7 @@ static PHP_FUNCTION(mecab_dictionary_info)
  * @param	bool	$dump_all	Whether dump all related nodes and paths or not.
  * @return	array	All elements of the node.
  */
-static PHP_FUNCTION(mecab_node_toarray)
+PHP_METHOD(MeCab_Node, toArray)
 {
 	/* declaration of the resources */
 	zval *object = getThis();
@@ -2423,7 +1999,7 @@ static PHP_FUNCTION(mecab_node_toarray)
  * @return	string	The formatted string.
  * @see	mecab_format_node
  */
-static PHP_FUNCTION(mecab_node_tostring)
+PHP_METHOD(MeCab_Node, __toString)
 {
 	/* declaration of the resources */
 	php_mecab_node *xnode = NULL;
@@ -2460,7 +2036,7 @@ static PHP_FUNCTION(mecab_node_tostring)
  * @return	resource mecab_node	The previous node.
  *								If the given node is the first one, returns FALSE.
  */
-static PHP_FUNCTION(mecab_node_prev)
+PHP_METHOD(MeCab_Node, getPrev)
 {
 	php_mecab_node_get_sibling_wrapper(INTERNAL_FUNCTION_PARAM_PASSTHRU, NODE_PREV);
 }
@@ -2477,7 +2053,7 @@ static PHP_FUNCTION(mecab_node_prev)
  * @return	resource mecab_node	The next node.
  *								If the given node is the last one, returns FALSE.
  */
-static PHP_FUNCTION(mecab_node_next)
+PHP_METHOD(MeCab_Node, getNext)
 {
 	php_mecab_node_get_sibling_wrapper(INTERNAL_FUNCTION_PARAM_PASSTHRU, NODE_NEXT);
 }
@@ -2494,7 +2070,7 @@ static PHP_FUNCTION(mecab_node_next)
  * @return	resource mecab_node	The next node which has same end point as the given node.
  *								If there is no `enext' node, returns false.
  */
-static PHP_FUNCTION(mecab_node_enext)
+PHP_METHOD(MeCab_Node, getENext)
 {
 	php_mecab_node_get_sibling_wrapper(INTERNAL_FUNCTION_PARAM_PASSTHRU, NODE_ENEXT);
 }
@@ -2511,7 +2087,7 @@ static PHP_FUNCTION(mecab_node_enext)
  * @return	resource mecab_node	The next node which has same beggining point as the given one.
  *								If there is no `bnext' node, returns false.
  */
-static PHP_FUNCTION(mecab_node_bnext)
+PHP_METHOD(MeCab_Node, getBNext)
 {
 	php_mecab_node_get_sibling_wrapper(INTERNAL_FUNCTION_PARAM_PASSTHRU, NODE_BNEXT);
 }
@@ -2528,7 +2104,7 @@ static PHP_FUNCTION(mecab_node_bnext)
  * @return	resource mecab_path	The next node which has same end point as the given node.
  *								If there is no `rpath' node, returns false.
  */
-static PHP_FUNCTION(mecab_node_rpath)
+PHP_METHOD(MeCab_Node, getRPath)
 {
 	php_mecab_node_get_path_wrapper(INTERNAL_FUNCTION_PARAM_PASSTHRU, NODE_RPATH);
 }
@@ -2545,7 +2121,7 @@ static PHP_FUNCTION(mecab_node_rpath)
  * @return	resource mecab_path	The next node which has same beggining point as the given one.
  *								If there is no `lpath' node, returns false.
  */
-static PHP_FUNCTION(mecab_node_lpath)
+PHP_METHOD(MeCab_Node, getLPath)
 {
 	php_mecab_node_get_path_wrapper(INTERNAL_FUNCTION_PARAM_PASSTHRU, NODE_LPATH);
 }
@@ -2561,7 +2137,7 @@ static PHP_FUNCTION(mecab_node_lpath)
  * @param	resource mecab_node	$node	The node of the source string.
  * @return	string	The surface of the node.
  */
-static PHP_FUNCTION(mecab_node_surface)
+PHP_METHOD(MeCab_Node, getSurface)
 {
 	PHP_MECAB_NODE_RETURN_PROPERTY(STRINGL, (char *)node->surface, (int)node->length);
 }
@@ -2577,7 +2153,7 @@ static PHP_FUNCTION(mecab_node_surface)
  * @param	resource mecab_node	$node	The node of the source string.
  * @return	string	The feature of the node.
  */
-static PHP_FUNCTION(mecab_node_feature)
+PHP_METHOD(MeCab_Node, getFeature)
 {
 	PHP_MECAB_NODE_RETURN_PROPERTY(STRING, (char *)node->feature);
 }
@@ -2593,7 +2169,7 @@ static PHP_FUNCTION(mecab_node_feature)
  * @param	resource mecab_node	$node	The node of the source string.
  * @return	int	The ID of the node.
  */
-static PHP_FUNCTION(mecab_node_id)
+PHP_METHOD(MeCab_Node, getId)
 {
 	PHP_MECAB_NODE_RETURN_PROPERTY(LONG, (long)node->id);
 }
@@ -2609,7 +2185,7 @@ static PHP_FUNCTION(mecab_node_id)
  * @param	resource mecab_node	$node	The node of the source string.
  * @return	int	The length of the surface of the node.
  */
-static PHP_FUNCTION(mecab_node_length)
+PHP_METHOD(MeCab_Node, getLength)
 {
 	PHP_MECAB_NODE_RETURN_PROPERTY(LONG, (long)node->length);
 }
@@ -2625,7 +2201,7 @@ static PHP_FUNCTION(mecab_node_length)
  * @param	resource mecab_node	$node	The node of the source string.
  * @return	int	The length of the surface and its leading whitespace of the node.
  */
-static PHP_FUNCTION(mecab_node_rlength)
+PHP_METHOD(MeCab_Node, getRLength)
 {
 	PHP_MECAB_NODE_RETURN_PROPERTY(LONG, (long)node->rlength);
 }
@@ -2641,7 +2217,7 @@ static PHP_FUNCTION(mecab_node_rlength)
  * @param	resource mecab_node	$node	The node of the source string.
  * @return	int	The ID of the right context.
  */
-static PHP_FUNCTION(mecab_node_rcattr)
+PHP_METHOD(MeCab_Node, getRcAttr)
 {
 	PHP_MECAB_NODE_RETURN_PROPERTY(LONG, (long)node->rcAttr);
 }
@@ -2657,7 +2233,7 @@ static PHP_FUNCTION(mecab_node_rcattr)
  * @param	resource mecab_node	$node	The node of the source string.
  * @return	int	The ID of the left context.
  */
-static PHP_FUNCTION(mecab_node_lcattr)
+PHP_METHOD(MeCab_Node, getLcAttr)
 {
 	PHP_MECAB_NODE_RETURN_PROPERTY(LONG, (long)node->lcAttr);
 }
@@ -2675,7 +2251,7 @@ static PHP_FUNCTION(mecab_node_lcattr)
  * @return	int	The ID of the Part-of-Speech.
  *				Currently, always returns 0.
  */
-static PHP_FUNCTION(mecab_node_posid)
+PHP_METHOD(MeCab_Node, getPosId)
 {
 	PHP_MECAB_NODE_RETURN_PROPERTY(LONG, (long)node->posid);
 }
@@ -2691,7 +2267,7 @@ static PHP_FUNCTION(mecab_node_posid)
  * @param	resource mecab_node	$node	The node of the source string.
  * @return	int	The type of the character.
  */
-static PHP_FUNCTION(mecab_node_char_type)
+PHP_METHOD(MeCab_Node, getCharType)
 {
 	PHP_MECAB_NODE_RETURN_PROPERTY(LONG, (long)node->char_type);
 }
@@ -2712,7 +2288,7 @@ static PHP_FUNCTION(mecab_node_char_type)
  *					MECAB_BOS_NODE (2:Beginning-of-Sentence)
  *					MECAB_EOS_NODE (3:End-of-Sentence)
  */
-static PHP_FUNCTION(mecab_node_stat)
+PHP_METHOD(MeCab_Node, getStat)
 {
 	PHP_MECAB_NODE_RETURN_PROPERTY(LONG, (long)node->stat);
 }
@@ -2728,7 +2304,7 @@ static PHP_FUNCTION(mecab_node_stat)
  * @param	resource mecab_node	$node	The node of the source string.
  * @return	bool	True if the node is the best, otherwise returns false.
  */
-static PHP_FUNCTION(mecab_node_isbest)
+PHP_METHOD(MeCab_Node, isBest)
 {
 	PHP_MECAB_NODE_RETURN_PROPERTY(BOOL, (node->isbest == 1));
 }
@@ -2744,7 +2320,7 @@ static PHP_FUNCTION(mecab_node_isbest)
  * @param	resource mecab_node	$node	The node of the source string.
  * @return	double	The forward log probability of the node.
  */
-static PHP_FUNCTION(mecab_node_alpha)
+PHP_METHOD(MeCab_Node, getAlpha)
 {
 	PHP_MECAB_NODE_RETURN_PROPERTY(DOUBLE, (double)node->alpha);
 }
@@ -2760,7 +2336,7 @@ static PHP_FUNCTION(mecab_node_alpha)
  * @param	resource mecab_node	$node	The node of the source string.
  * @return	double	The backward log probability of the node.
  */
-static PHP_FUNCTION(mecab_node_beta)
+PHP_METHOD(MeCab_Node, getBeta)
 {
 	PHP_MECAB_NODE_RETURN_PROPERTY(DOUBLE, (double)node->beta);
 }
@@ -2776,7 +2352,7 @@ static PHP_FUNCTION(mecab_node_beta)
  * @param	resource mecab_node	$node	The node of the source string.
  * @return	double	The marginal probability of the node.
  */
-static PHP_FUNCTION(mecab_node_prob)
+PHP_METHOD(MeCab_Node, getProb)
 {
 	PHP_MECAB_NODE_RETURN_PROPERTY(DOUBLE, (double)node->prob);
 }
@@ -2792,7 +2368,7 @@ static PHP_FUNCTION(mecab_node_prob)
  * @param	resource mecab_node	$node	The node of the source string.
  * @return	int	The word arising cost of the node.
  */
-static PHP_FUNCTION(mecab_node_wcost)
+PHP_METHOD(MeCab_Node, getWCost)
 {
 	PHP_MECAB_NODE_RETURN_PROPERTY(LONG, (long)node->wcost);
 }
@@ -2808,7 +2384,7 @@ static PHP_FUNCTION(mecab_node_wcost)
  * @param	resource mecab_node	$node	The node of the source string.
  * @return	int	The cumulative cost of the node.
  */
-static PHP_FUNCTION(mecab_node_cost)
+PHP_METHOD(MeCab_Node, getCost)
 {
 	PHP_MECAB_NODE_RETURN_PROPERTY(LONG, (long)node->cost);
 }
@@ -2825,7 +2401,7 @@ static PHP_FUNCTION(mecab_node_cost)
  * @return	resource mecab_path	The rnext path.
  *								If the given path is the first one, returns FALSE.
  */
-static PHP_FUNCTION(mecab_path_rnext)
+PHP_METHOD(MeCab_Path, getRNext)
 {
 	php_mecab_path_get_sibling_wrapper(INTERNAL_FUNCTION_PARAM_PASSTHRU, PATH_RNEXT);
 }
@@ -2842,7 +2418,7 @@ static PHP_FUNCTION(mecab_path_rnext)
  * @return	resource mecab_path	The lnext path.
  *								If the given path is the last one, returns FALSE.
  */
-static PHP_FUNCTION(mecab_path_lnext)
+PHP_METHOD(MeCab_Path, getLNext)
 {
 	php_mecab_path_get_sibling_wrapper(INTERNAL_FUNCTION_PARAM_PASSTHRU, PATH_LNEXT);
 }
@@ -2859,7 +2435,7 @@ static PHP_FUNCTION(mecab_path_lnext)
  * @return	resource mecab_node	The next path which has same end point as the given path.
  *								If there is no `rnode' path, returns false.
  */
-static PHP_FUNCTION(mecab_path_rnode)
+PHP_METHOD(MeCab_Path, getRNode)
 {
 	php_mecab_path_get_node_wrapper(INTERNAL_FUNCTION_PARAM_PASSTHRU, PATH_RNODE);
 }
@@ -2876,7 +2452,7 @@ static PHP_FUNCTION(mecab_path_rnode)
  * @return	resource mecab_node	The next path which has same beggining point as the given one.
  *								If there is no `lnode' path, returns false.
  */
-static PHP_FUNCTION(mecab_path_lnode)
+PHP_METHOD(MeCab_Path, getLNode)
 {
 	php_mecab_path_get_node_wrapper(INTERNAL_FUNCTION_PARAM_PASSTHRU, PATH_LNODE);
 }
@@ -2892,7 +2468,7 @@ static PHP_FUNCTION(mecab_path_lnode)
  * @param	resource mecab_path	$path	The path of the source string.
  * @return	double	The marginal probability of the path.
  */
-static PHP_FUNCTION(mecab_path_prob)
+PHP_METHOD(MeCab_Path, getProb)
 {
 	PHP_MECAB_PATH_RETURN_PROPERTY(DOUBLE, (double)(path->prob));
 }
@@ -2908,7 +2484,7 @@ static PHP_FUNCTION(mecab_path_prob)
  * @param	resource mecab_path	$path	The path of the source string.
  * @return	int	The cumulative cost of the path.
  */
-static PHP_FUNCTION(mecab_path_cost)
+PHP_METHOD(MeCab_Path, getCost)
 {
 	PHP_MECAB_PATH_RETURN_PROPERTY(LONG, (long)(path->cost));
 }
@@ -2929,7 +2505,7 @@ static PHP_FUNCTION(mecab_path_cost)
  * @access	private
  * @igore
  */
-static PHP_METHOD(MeCab_Node, __construct)
+PHP_METHOD(MeCab_Node, __construct)
 {
 	return;
 }
@@ -2948,7 +2524,7 @@ static PHP_METHOD(MeCab_Node, __construct)
  * @access	public
  * @ignore
  */
-static PHP_METHOD(MeCab_Node, __get)
+PHP_METHOD(MeCab_Node, __get)
 {
 	/* declaration of the resources */
 	zval *object = getThis();
@@ -3029,7 +2605,7 @@ static PHP_METHOD(MeCab_Node, __get)
  * @access	public
  * @ignore
  */
-static PHP_METHOD(MeCab_Node, __isset)
+PHP_METHOD(MeCab_Node, __isset)
 {
 	/* declaration of the resources */
 	php_mecab_node *xnode = NULL;
@@ -3091,7 +2667,7 @@ static PHP_METHOD(MeCab_Node, __isset)
  * @access	public
  * @ignore
  */
-static PHP_METHOD(MeCab_Node, getIterator)
+PHP_METHOD(MeCab_Node, getIterator)
 {
 	php_mecab_node_object *intern;
 	php_mecab_node *xnode;
@@ -3128,7 +2704,7 @@ static PHP_METHOD(MeCab_Node, getIterator)
  * @throws	InvalidArgumentException
  * @access	public
  */
-static PHP_METHOD(MeCab_Node, setTraverse)
+PHP_METHOD(MeCab_Node, setTraverse)
 {
 	php_mecab_node_object *intern;
 	long traverse = 0;
@@ -3178,7 +2754,7 @@ static PHP_METHOD(MeCab_Node, setTraverse)
  * @access	private
  * @igore
  */
-static PHP_METHOD(MeCab_NodeIterator, __construct)
+PHP_METHOD(MeCab_NodeIterator, __construct)
 {
 	return;
 }
@@ -3194,7 +2770,7 @@ static PHP_METHOD(MeCab_NodeIterator, __construct)
  * @access	public
  * @igore
  */
-static PHP_METHOD(MeCab_NodeIterator, current)
+PHP_METHOD(MeCab_NodeIterator, current)
 {
 	php_mecab_node_object *intern;
 	php_mecab_node *xnode;
@@ -3233,7 +2809,7 @@ static PHP_METHOD(MeCab_NodeIterator, current)
  * @access	public
  * @igore
  */
-static PHP_METHOD(MeCab_NodeIterator, key)
+PHP_METHOD(MeCab_NodeIterator, key)
 {
 	php_mecab_node_object *intern;
 	php_mecab_node *xnode;
@@ -3265,7 +2841,7 @@ static PHP_METHOD(MeCab_NodeIterator, key)
  * @access	public
  * @igore
  */
-static PHP_METHOD(MeCab_NodeIterator, next)
+PHP_METHOD(MeCab_NodeIterator, next)
 {
 	php_mecab_node_object *intern;
 	php_mecab_node *xnode;
@@ -3309,7 +2885,7 @@ static PHP_METHOD(MeCab_NodeIterator, next)
  * @access	public
  * @igore
  */
-static PHP_METHOD(MeCab_NodeIterator, rewind)
+PHP_METHOD(MeCab_NodeIterator, rewind)
 {
 	php_mecab_node_object *intern;
 	php_mecab_node *xnode;
@@ -3334,7 +2910,7 @@ static PHP_METHOD(MeCab_NodeIterator, rewind)
  * @access	public
  * @igore
  */
-static PHP_METHOD(MeCab_NodeIterator, valid)
+PHP_METHOD(MeCab_NodeIterator, valid)
 {
 	php_mecab_node_object *intern;
 	php_mecab_node *xnode;
@@ -3364,7 +2940,7 @@ static PHP_METHOD(MeCab_NodeIterator, valid)
  * @access	private
  * @igore
  */
-static PHP_METHOD(MeCab_Path, __construct)
+PHP_METHOD(MeCab_Path, __construct)
 {
 	return;
 }
@@ -3383,7 +2959,7 @@ static PHP_METHOD(MeCab_Path, __construct)
  * @access	public
  * @ignore
  */
-static PHP_METHOD(MeCab_Path, __get)
+PHP_METHOD(MeCab_Path, __get)
 {
 	/* declaration of the resources */
 	zval *object = getThis();
@@ -3442,7 +3018,7 @@ static PHP_METHOD(MeCab_Path, __get)
  * @access	public
  * @ignore
  */
-static PHP_METHOD(MeCab_Path, __isset)
+PHP_METHOD(MeCab_Path, __isset)
 {
 	/* declaration of the resources */
 	php_mecab_path *xpath = NULL;
