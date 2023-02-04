@@ -35,6 +35,7 @@
 #else
 #include "mecab_legacy_arginfo.h"
 #endif
+#include <ext/spl/spl_exceptions.h>
 
 #define PATHBUFSIZE (MAXPATHLEN + 3)
 
@@ -45,12 +46,6 @@ static ZEND_DECLARE_MODULE_GLOBALS(mecab)
 /* }}} */
 
 /* {{{ class entries */
-
-static zend_class_entry *ext_ce_Iterator;
-static zend_class_entry *ext_ce_IteratorAggregate;
-static zend_class_entry *ext_ce_BadMethodCallException;
-static zend_class_entry *ext_ce_InvalidArgumentException;
-static zend_class_entry *ext_ce_OutOfRangeException;
 
 static zend_class_entry *ce_MeCab_Tagger = NULL;
 static zend_class_entry *ce_MeCab_Node = NULL;
@@ -254,19 +249,6 @@ static PHP_MINIT_FUNCTION(mecab)
 	PHP_MECAB_REGISTER_NS_CONSTANT(USR_DIC);
 	PHP_MECAB_REGISTER_NS_CONSTANT(UNK_DIC);
 
-	ext_ce_Iterator = php_mecab_get_class_entry("iterator");
-	ext_ce_IteratorAggregate = php_mecab_get_class_entry("iteratoraggregate");
-	ext_ce_BadMethodCallException = php_mecab_get_class_entry("badmethodcallexception");
-	ext_ce_InvalidArgumentException = php_mecab_get_class_entry("invalidargumentexception");
-	ext_ce_OutOfRangeException = php_mecab_get_class_entry("outofrangeexception");
-	if (ext_ce_Iterator == NULL ||
-		ext_ce_IteratorAggregate == NULL ||
-		ext_ce_BadMethodCallException == NULL ||
-		ext_ce_InvalidArgumentException == NULL ||
-		ext_ce_OutOfRangeException == NULL)
-	{
-		return FAILURE;
-	}
 	{
 		ce_MeCab_Tagger = register_class_MeCab_Tagger();
 		ce_MeCab_Tagger->create_object = php_mecab_object_new;
@@ -277,10 +259,10 @@ static PHP_MINIT_FUNCTION(mecab)
 		php_mecab_object_handlers.offset = XtOffsetOf(php_mecab_object, std);
 	}
 	{
-		ce_MeCab_NodeIterator = register_class_MeCab_NodeIterator(ext_ce_Iterator);
+		ce_MeCab_NodeIterator = register_class_MeCab_NodeIterator(zend_ce_iterator);
 		ce_MeCab_NodeIterator->create_object = php_mecab_node_object_new;
 
-		ce_MeCab_Node = register_class_MeCab_Node(ext_ce_IteratorAggregate);
+		ce_MeCab_Node = register_class_MeCab_Node(zend_ce_aggregate);
 		ce_MeCab_Node->create_object = php_mecab_node_object_new;
 
 		memcpy(&php_mecab_node_object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
@@ -1299,7 +1281,7 @@ PHP_METHOD(MeCab_Tagger, __construct)
 		xmecab = intern->ptr;
 		if (xmecab->ptr != NULL) {
 			mecab_destroy(mecab);
-			zend_throw_exception(ext_ce_BadMethodCallException,
+			zend_throw_exception(spl_ce_BadMethodCallException,
 					"MeCab already initialized", 0);
 			return;
 		}
@@ -2712,14 +2694,14 @@ PHP_METHOD(MeCab_Node, setTraverse)
 #if PHP_VERSION_ID >= 50300
 	zend_error_handling error_handling;
 
-	zend_replace_error_handling(EH_THROW, ext_ce_InvalidArgumentException, &error_handling);
+	zend_replace_error_handling(EH_THROW, spl_ce_InvalidArgumentException, &error_handling);
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "l", &traverse) == FAILURE) {
 		zend_restore_error_handling(&error_handling);
 		return;
 	}
 	zend_restore_error_handling(&error_handling);
 #else
-	php_set_error_handling(EH_THROW, ext_ce_InvalidArgumentException);
+	php_set_error_handling(EH_THROW, spl_ce_InvalidArgumentException);
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "l", &traverse) == FAILURE) {
 		php_std_error_handling();
 		return;
@@ -2735,7 +2717,7 @@ PHP_METHOD(MeCab_Node, setTraverse)
 	{
 		intern->mode = (php_mecab_traverse_mode)traverse;
 	} else {
-		zend_throw_exception(ext_ce_InvalidArgumentException,
+		zend_throw_exception(spl_ce_InvalidArgumentException,
 				"Invalid traverse mdoe given", 0);
 	}
 }
