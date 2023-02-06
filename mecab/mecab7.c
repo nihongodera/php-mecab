@@ -1941,12 +1941,14 @@ PHP_METHOD(MeCab_Node, toArray)
 
 	/* assign siblings and paths */
 	if (dump_all) {
-		add_assoc_zval(return_value, "prev",  php_mecab_node_get_sibling(NULL, object, xnode, NODE_PREV));
-		add_assoc_zval(return_value, "next",  php_mecab_node_get_sibling(NULL, object, xnode, NODE_NEXT));
-		add_assoc_zval(return_value, "enext", php_mecab_node_get_sibling(NULL, object, xnode, NODE_ENEXT));
-		add_assoc_zval(return_value, "bnext", php_mecab_node_get_sibling(NULL, object, xnode, NODE_BNEXT));
-		add_assoc_zval(return_value, "rpath", php_mecab_node_get_path(NULL, object, xnode, NODE_RPATH));
-		add_assoc_zval(return_value, "lpath", php_mecab_node_get_path(NULL, object, xnode, NODE_LPATH));
+		zval tmp;
+		ZVAL_UNDEF(&tmp);
+		add_assoc_zval(return_value, "prev",  php_mecab_node_get_sibling(&tmp, object, xnode, NODE_PREV));
+		add_assoc_zval(return_value, "next",  php_mecab_node_get_sibling(&tmp, object, xnode, NODE_NEXT));
+		add_assoc_zval(return_value, "enext", php_mecab_node_get_sibling(&tmp, object, xnode, NODE_ENEXT));
+		add_assoc_zval(return_value, "bnext", php_mecab_node_get_sibling(&tmp, object, xnode, NODE_BNEXT));
+		add_assoc_zval(return_value, "rpath", php_mecab_node_get_path(&tmp, object, xnode, NODE_RPATH));
+		add_assoc_zval(return_value, "lpath", php_mecab_node_get_path(&tmp, object, xnode, NODE_LPATH));
 	}
 
 	/* assign node info */
