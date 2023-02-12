@@ -1944,10 +1944,15 @@ PHP_METHOD(MeCab_Node, toArray)
 		zval tmp;
 		ZVAL_UNDEF(&tmp);
 		add_assoc_zval(return_value, "prev",  php_mecab_node_get_sibling(&tmp, object, xnode, NODE_PREV));
+		ZVAL_UNDEF(&tmp);
 		add_assoc_zval(return_value, "next",  php_mecab_node_get_sibling(&tmp, object, xnode, NODE_NEXT));
+		ZVAL_UNDEF(&tmp);
 		add_assoc_zval(return_value, "enext", php_mecab_node_get_sibling(&tmp, object, xnode, NODE_ENEXT));
+		ZVAL_UNDEF(&tmp);
 		add_assoc_zval(return_value, "bnext", php_mecab_node_get_sibling(&tmp, object, xnode, NODE_BNEXT));
+		ZVAL_UNDEF(&tmp);
 		add_assoc_zval(return_value, "rpath", php_mecab_node_get_path(&tmp, object, xnode, NODE_RPATH));
+		ZVAL_UNDEF(&tmp);
 		add_assoc_zval(return_value, "lpath", php_mecab_node_get_path(&tmp, object, xnode, NODE_LPATH));
 	}
 
