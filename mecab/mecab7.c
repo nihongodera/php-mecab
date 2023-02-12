@@ -933,47 +933,50 @@ php_mecab_check_path(const char *path, size_t length, char *real_path)
 
 /* check for option */
 static int
-php_mecab_check_option(const char *option)
+php_mecab_check_option(zend_string *zopt)
 {
-	/* not an option */
-	if (*option != '-') {
+	const char *opt = ZSTR_VAL(zopt);
+	size_t len = ZSTR_LEN(zopt);
+
+	/* not an opt */
+	if (*opt != '-') {
 		return PHP_MECAB_GETOPT_FAILURE;
 	}
 
 	/* resource file */
-	if (!strcmp(option, "-r") || !strcmp(option, "--rcfile")) {
+	if (!zend_binary_strcmp(opt, len, ZEND_STRL("-r")) || !zend_binary_strcmp(opt, len, ZEND_STRL("--rcfile"))) {
 		return PHP_MECAB_GETOPT_RCFILE_EXPECTED;
 	}
 
 	/* system dicdir */
-	if (!strcmp(option, "-d") || !strcmp(option, "--dicdir")) {
+	if (!zend_binary_strcmp(opt, len, ZEND_STRL("-d")) || !zend_binary_strcmp(opt, len, ZEND_STRL("--dicdir"))) {
 		return PHP_MECAB_GETOPT_DICDIR_EXPECTED;
 	}
 
 	/* user dictionary */
-	if (!strcmp(option, "-u") || !strcmp(option, "--userdic")) {
+	if (!zend_binary_strcmp(opt, len, ZEND_STRL("-u")) || !zend_binary_strcmp(opt, len, ZEND_STRL("--userdic"))) {
 		return PHP_MECAB_GETOPT_USERDIC_EXPECTED;
 	}
 
 	/* options whose parameter is not filename */
-	if (!strcmp(option, "-l") || !strcmp(option, "--lattice-level") ||
-		!strcmp(option, "-O") || !strcmp(option, "--output-format-type") ||
-		!strcmp(option, "-F") || !strcmp(option, "--node-format") ||
-		!strcmp(option, "-U") || !strcmp(option, "--unk-format") ||
-		!strcmp(option, "-B") || !strcmp(option, "--bos-format") ||
-		!strcmp(option, "-E") || !strcmp(option, "--eos-format") ||
-		!strcmp(option, "-x") || !strcmp(option, "--unk-feature") ||
-		!strcmp(option, "-b") || !strcmp(option, "--input-buffer-size") ||
-		!strcmp(option, "-N") || !strcmp(option, "--nbest") ||
-		!strcmp(option, "-t") || !strcmp(option, "--theta"))
+	if (!zend_binary_strcmp(opt, len, ZEND_STRL("-l")) || !zend_binary_strcmp(opt, len, ZEND_STRL("--lattice-level")) ||
+		!zend_binary_strcmp(opt, len, ZEND_STRL("-O")) || !zend_binary_strcmp(opt, len, ZEND_STRL("--output-format-type")) ||
+		!zend_binary_strcmp(opt, len, ZEND_STRL("-F")) || !zend_binary_strcmp(opt, len, ZEND_STRL("--node-format")) ||
+		!zend_binary_strcmp(opt, len, ZEND_STRL("-U")) || !zend_binary_strcmp(opt, len, ZEND_STRL("--unk-format")) ||
+		!zend_binary_strcmp(opt, len, ZEND_STRL("-B")) || !zend_binary_strcmp(opt, len, ZEND_STRL("--bos-format")) ||
+		!zend_binary_strcmp(opt, len, ZEND_STRL("-E")) || !zend_binary_strcmp(opt, len, ZEND_STRL("--eos-format")) ||
+		!zend_binary_strcmp(opt, len, ZEND_STRL("-x")) || !zend_binary_strcmp(opt, len, ZEND_STRL("--unk-feature")) ||
+		!zend_binary_strcmp(opt, len, ZEND_STRL("-b")) || !zend_binary_strcmp(opt, len, ZEND_STRL("--input-buffer-size")) ||
+		!zend_binary_strcmp(opt, len, ZEND_STRL("-N")) || !zend_binary_strcmp(opt, len, ZEND_STRL("--nbest")) ||
+		!zend_binary_strcmp(opt, len, ZEND_STRL("-t")) || !zend_binary_strcmp(opt, len, ZEND_STRL("--theta")))
 	{
 		return PHP_MECAB_GETOPT_SUCCESS;
 	}
 
 	/* options which does not have parameter */
-	if (!strcmp(option, "-a") || !strcmp(option, "--all-morphs") ||
-		!strcmp(option, "-p") || !strcmp(option, "--partial") ||
-		!strcmp(option, "-C") || !strcmp(option, "--allocate-sentence"))
+	if (!zend_binary_strcmp(opt, len, ZEND_STRL("-a")) || !zend_binary_strcmp(opt, len, ZEND_STRL("--all-morphs")) ||
+		!zend_binary_strcmp(opt, len, ZEND_STRL("-p")) || !zend_binary_strcmp(opt, len, ZEND_STRL("--partial")) ||
+		!zend_binary_strcmp(opt, len, ZEND_STRL("-C")) || !zend_binary_strcmp(opt, len, ZEND_STRL("--allocate-sentence")))
 	{
 		return (PHP_MECAB_GETOPT_SUCCESS | PHP_MECAB_GETOPT_FLAG_EXPECTED);
 	}
@@ -1176,7 +1179,7 @@ PHP_METHOD(MeCab_Tagger, __construct)
 		ZEND_HASH_FOREACH_KEY_VAL(options, num_key, key, entry) {
 			convert_to_string_ex(entry);
 		  if (key) {
-				getopt_result = php_mecab_check_option(ZSTR_VAL(key));
+				getopt_result = php_mecab_check_option(key);
 				if (getopt_result == FAILURE) {
 					php_error_docref(NULL, E_WARNING, "Invalid option '%s' given", ZSTR_VAL(key));
 					efree(argv);
@@ -1203,7 +1206,7 @@ PHP_METHOD(MeCab_Tagger, __construct)
 				path_expected = 0;
 			} else {
 				if (flag_expected) {
-					getopt_result = php_mecab_check_option(Z_STRVAL_P(entry));
+					getopt_result = php_mecab_check_option(Z_STR_P(entry));
 					if (getopt_result == FAILURE) {
 						php_error_docref(NULL, E_WARNING,
 								"Invalid option '%s' given", Z_STRVAL_P(entry));
@@ -2523,6 +2526,7 @@ PHP_METHOD(MeCab_Node, __get)
 	/* declaration of the arguments */
 	zend_string *zname = NULL;
 	const char *name = NULL;
+	size_t len;
 
 	/* parse the arguments */
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "S", &zname) == FAILURE) {
@@ -2532,49 +2536,50 @@ PHP_METHOD(MeCab_Node, __get)
 		xnode = intern->ptr;
 		node = xnode->ptr;
 		name = ZSTR_VAL(zname);
+		len = ZSTR_LEN(zname);
 	}
 
 	/* check for given property name */
-	if (!strcmp(name, "prev")) {
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("prev"))) {
 		php_mecab_node_get_sibling(return_value, object, xnode, NODE_PREV);
 		return;
 	}
-	if (!strcmp(name, "next")) {
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("next"))) {
 		php_mecab_node_get_sibling(return_value, object, xnode, NODE_NEXT);
 		return;
 	}
-	if (!strcmp(name, "enext")) {
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("enext"))) {
 		php_mecab_node_get_sibling(return_value, object, xnode, NODE_ENEXT);
 		return;
 	}
-	if (!strcmp(name, "bnext")) {
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("bnext"))) {
 		php_mecab_node_get_sibling(return_value, object, xnode, NODE_BNEXT);
 		return;
 	}
-	if (!strcmp(name, "rpath")) {
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("rpath"))) {
 		php_mecab_node_get_path(return_value, object, xnode, NODE_RPATH);
 		return;
 	}
-	if (!strcmp(name, "lpath")) {
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("lpath"))) {
 		php_mecab_node_get_path(return_value, object, xnode, NODE_LPATH);
 		return;
 	}
-	if (!strcmp(name, "surface"))   RETURN_STRINGL((char *)node->surface, (int)node->length);
-	if (!strcmp(name, "feature"))   RETURN_STRING((char *)node->feature);
-	if (!strcmp(name, "id"))        RETURN_LONG((long)node->id);
-	if (!strcmp(name, "length"))    RETURN_LONG((long)node->length);
-	if (!strcmp(name, "rlength"))   RETURN_LONG((long)node->rlength);
-	if (!strcmp(name, "rcAttr"))    RETURN_LONG((long)node->rcAttr);
-	if (!strcmp(name, "lcAttr"))    RETURN_LONG((long)node->lcAttr);
-	if (!strcmp(name, "posid"))     RETURN_LONG((long)node->posid);
-	if (!strcmp(name, "char_type")) RETURN_LONG((long)node->char_type);
-	if (!strcmp(name, "stat"))      RETURN_LONG((long)node->stat);
-	if (!strcmp(name, "isbest"))    RETURN_BOOL((long)node->isbest);
-	if (!strcmp(name, "alpha"))     RETURN_DOUBLE((double)node->alpha);
-	if (!strcmp(name, "beta"))      RETURN_DOUBLE((double)node->beta);
-	if (!strcmp(name, "prob"))      RETURN_DOUBLE((double)node->prob);
-	if (!strcmp(name, "wcost"))     RETURN_LONG((long)node->wcost);
-	if (!strcmp(name, "cost"))      RETURN_LONG((long)node->cost);
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("surface")))   RETURN_STRINGL((char *)node->surface, (int)node->length);
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("feature")))   RETURN_STRING((char *)node->feature);
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("id")))        RETURN_LONG((long)node->id);
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("length")))    RETURN_LONG((long)node->length);
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("rlength")))   RETURN_LONG((long)node->rlength);
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("rcAttr")))    RETURN_LONG((long)node->rcAttr);
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("lcAttr")))    RETURN_LONG((long)node->lcAttr);
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("posid")))     RETURN_LONG((long)node->posid);
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("char_type"))) RETURN_LONG((long)node->char_type);
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("stat")))      RETURN_LONG((long)node->stat);
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("isbest")))    RETURN_BOOL((long)node->isbest);
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("alpha")))     RETURN_DOUBLE((double)node->alpha);
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("beta")))      RETURN_DOUBLE((double)node->beta);
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("prob")))      RETURN_DOUBLE((double)node->prob);
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("wcost")))     RETURN_LONG((long)node->wcost);
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("cost")))      RETURN_LONG((long)node->cost);
 
 	/* when going to fetch undefined property */
 	php_error_docref(NULL, E_NOTICE, "Undefined property (%s)", name);
@@ -2603,6 +2608,7 @@ PHP_METHOD(MeCab_Node, __isset)
 	/* declaration of the arguments */
 	zend_string *zname = NULL;
 	const char *name = NULL;
+	size_t len;
 
 	/* parse the arguments */
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "S", &zname) == FAILURE) {
@@ -2612,32 +2618,33 @@ PHP_METHOD(MeCab_Node, __isset)
 		xnode = intern->ptr;
 		node = xnode->ptr;
 		name = ZSTR_VAL(zname);
+		len = ZSTR_LEN(zname);
 	}
 
 	/* check for given property name */
-	if ((!strcmp(name, "prev") && node->prev != NULL) ||
-		(!strcmp(name, "next") && node->next != NULL) ||
-		(!strcmp(name, "enext") && node->enext != NULL) ||
-		(!strcmp(name, "bnext") && node->bnext != NULL) ||
-		(!strcmp(name, "rpath") && node->rpath != NULL) ||
-		(!strcmp(name, "lpath") && node->lpath != NULL) ||
-		!strcmp(name, "surface") ||
-		!strcmp(name, "feature") ||
-		!strcmp(name, "id") ||
-		!strcmp(name, "length") ||
-		!strcmp(name, "rlength") ||
-		!strcmp(name, "rcAttr") ||
-		!strcmp(name, "lcAttr") ||
-		!strcmp(name, "posid") ||
-		!strcmp(name, "char_type") ||
-		!strcmp(name, "stat") ||
-		!strcmp(name, "isbest") ||
-		!strcmp(name, "sentence_length") ||
-		!strcmp(name, "alpha") ||
-		!strcmp(name, "beta") ||
-		!strcmp(name, "prob") ||
-		!strcmp(name, "wcost") ||
-		!strcmp(name, "cost"))
+	if ((!zend_binary_strcmp(name, len, ZEND_STRL("prev")) && node->prev != NULL) ||
+		(!zend_binary_strcmp(name, len, ZEND_STRL("next")) && node->next != NULL) ||
+		(!zend_binary_strcmp(name, len, ZEND_STRL("enext")) && node->enext != NULL) ||
+		(!zend_binary_strcmp(name, len, ZEND_STRL("bnext")) && node->bnext != NULL) ||
+		(!zend_binary_strcmp(name, len, ZEND_STRL("rpath")) && node->rpath != NULL) ||
+		(!zend_binary_strcmp(name, len, ZEND_STRL("lpath")) && node->lpath != NULL) ||
+		!zend_binary_strcmp(name, len, ZEND_STRL("surface")) ||
+		!zend_binary_strcmp(name, len, ZEND_STRL("feature")) ||
+		!zend_binary_strcmp(name, len, ZEND_STRL("id")) ||
+		!zend_binary_strcmp(name, len, ZEND_STRL("length")) ||
+		!zend_binary_strcmp(name, len, ZEND_STRL("rlength")) ||
+		!zend_binary_strcmp(name, len, ZEND_STRL("rcAttr")) ||
+		!zend_binary_strcmp(name, len, ZEND_STRL("lcAttr")) ||
+		!zend_binary_strcmp(name, len, ZEND_STRL("posid")) ||
+		!zend_binary_strcmp(name, len, ZEND_STRL("char_type")) ||
+		!zend_binary_strcmp(name, len, ZEND_STRL("stat")) ||
+		!zend_binary_strcmp(name, len, ZEND_STRL("isbest")) ||
+		!zend_binary_strcmp(name, len, ZEND_STRL("sentence_length")) ||
+		!zend_binary_strcmp(name, len, ZEND_STRL("alpha")) ||
+		!zend_binary_strcmp(name, len, ZEND_STRL("beta")) ||
+		!zend_binary_strcmp(name, len, ZEND_STRL("prob")) ||
+		!zend_binary_strcmp(name, len, ZEND_STRL("wcost")) ||
+		!zend_binary_strcmp(name, len, ZEND_STRL("cost")))
 	{
 		RETURN_TRUE;
 	}
@@ -2958,6 +2965,7 @@ PHP_METHOD(MeCab_Path, __get)
 	/* declaration of the arguments */
 	zend_string *zname = NULL;
 	const char *name = NULL;
+	size_t len;
 
 	/* parse the arguments */
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "S", &zname) == FAILURE) {
@@ -2967,27 +2975,28 @@ PHP_METHOD(MeCab_Path, __get)
 		xpath = intern->ptr;
 		path = xpath->ptr;
 		name = ZSTR_VAL(zname);
+		len = ZSTR_LEN(zname);
 	}
 
 	/* check for given property name */
-	if (!strcmp(name, "rnext")) {
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("rnext"))) {
 		php_mecab_path_get_sibling(return_value, object, xpath, PATH_RNEXT);
 		return;
 	}
-	if (!strcmp(name, "lnext")) {
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("lnext"))) {
 		php_mecab_path_get_sibling(return_value, object, xpath, PATH_LNEXT);
 		return;
 	}
-	if (!strcmp(name, "rnode")) {
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("rnode"))) {
 		php_mecab_path_get_node(return_value, object, xpath, PATH_RNODE);
 		return;
 	}
-	if (!strcmp(name, "lnode")) {
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("lnode"))) {
 		php_mecab_path_get_node(return_value, object, xpath, PATH_LNODE);
 		return;
 	}
-	if (!strcmp(name, "prob")) RETURN_DOUBLE((double)(path->prob));
-	if (!strcmp(name, "cost")) RETURN_LONG((long)(path->cost));
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("prob"))) RETURN_DOUBLE((double)(path->prob));
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("cost"))) RETURN_LONG((long)(path->cost));
 
 	/* when going to fetch undefined property */
 	php_error_docref(NULL, E_NOTICE, "Undefined property (%s)", name);
@@ -3016,6 +3025,7 @@ PHP_METHOD(MeCab_Path, __isset)
 	/* declaration of the arguments */
 	zend_string *zname = NULL;
 	const char *name = NULL;
+	size_t len;
 
 	/* parse the arguments */
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "S", &zname) == FAILURE) {
@@ -3025,15 +3035,16 @@ PHP_METHOD(MeCab_Path, __isset)
 		xpath = intern->ptr;
 		path = xpath->ptr;
 		name = ZSTR_VAL(zname);
+		len = ZSTR_LEN(zname);
 	}
 
 	/* check for given property name */
-	if ((!strcmp(name, "rnext") && path->rnext != NULL) ||
-		(!strcmp(name, "lnext") && path->lnext != NULL) ||
-		(!strcmp(name, "rnode") && path->rnode != NULL) ||
-		(!strcmp(name, "lnode") && path->lnode != NULL) ||
-		!strcmp(name, "prob") ||
-		!strcmp(name, "cost"))
+	if ((!zend_binary_strcmp(name, len, ZEND_STRL("rnext")) && path->rnext != NULL) ||
+		(!zend_binary_strcmp(name, len, ZEND_STRL("lnext")) && path->lnext != NULL) ||
+		(!zend_binary_strcmp(name, len, ZEND_STRL("rnode")) && path->rnode != NULL) ||
+		(!zend_binary_strcmp(name, len, ZEND_STRL("lnode")) && path->lnode != NULL) ||
+		!zend_binary_strcmp(name, len, ZEND_STRL("prob")) ||
+		!zend_binary_strcmp(name, len, ZEND_STRL("cost")))
 	{
 		RETURN_TRUE;
 	}
