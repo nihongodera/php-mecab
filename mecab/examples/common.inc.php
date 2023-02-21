@@ -25,12 +25,13 @@ defined('PHP_EOL') || define('PHP_EOL', strncasecmp(PHP_OS, 'WIN', 3) ? "\n" : "
  * 設定ファイル・辞書・ユーザ辞書のパスは、それぞれ php.ini の
  * mecab.default_rcfile, mecab.default_dicdir, mecab.default_userdic で設定できる。
  */
-$dic = '/opt/local/lib/mecab/dic/ipadic-utf8';
-$_dl = __LINE__ - 1;
+if (($dic = getenv('PHP_MECAB_EXAMPLE_DIC')) === false) {
+    $dic = '/opt/local/lib/mecab/dic/ipadic-utf8';
+}
 if (!empty($dic)) {
     if (!file_exists($dic)) {
-        printf('%s is not exists.%s', $dic, PHP_EOL);
-        printf('please edit line %d in %s.%s', $_dl, __FILE__, PHP_EOL);
+        printf('%s does not exist.%s', $dic, PHP_EOL);
+        echo "Please set env PHP_MECAB_EXAMPLE_DIC to point to the dictionary.", PHP_EOL;
         exit(1);
     }
     ini_set('mecab.default_dicdir', $dic);
