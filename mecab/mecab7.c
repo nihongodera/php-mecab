@@ -268,9 +268,9 @@ static PHP_MINIT_FUNCTION(mecab)
 		zend_declare_class_constant_long(ce_MeCab_Node, "BOS", 3, MECAB_BOS_NODE);
 		zend_declare_class_constant_long(ce_MeCab_Node, "EOS", 3, MECAB_EOS_NODE);
 
-		zend_declare_class_constant_long(ce_MeCab_Node, "TRAVERSE_NEXT", 13, (long)TRAVERSE_NEXT);
-		zend_declare_class_constant_long(ce_MeCab_Node, "TRAVERSE_ENEXT", 14, (long)TRAVERSE_ENEXT);
-		zend_declare_class_constant_long(ce_MeCab_Node, "TRAVERSE_BNEXT", 14, (long)TRAVERSE_BNEXT);
+		zend_declare_class_constant_long(ce_MeCab_Node, "TRAVERSE_NEXT", 13, (zend_long)TRAVERSE_NEXT);
+		zend_declare_class_constant_long(ce_MeCab_Node, "TRAVERSE_ENEXT", 14, (zend_long)TRAVERSE_ENEXT);
+		zend_declare_class_constant_long(ce_MeCab_Node, "TRAVERSE_BNEXT", 14, (zend_long)TRAVERSE_BNEXT);
 	}
 	{
 		ce_MeCab_Path = register_class_MeCab_Path();
@@ -1405,7 +1405,7 @@ PHP_METHOD(MeCab_Tagger, getLatticeLevel)
 	/* parse the arguments */
 	PHP_MECAB_FROM_PARAMETER();
 
-	RETURN_LONG((long)mecab_get_lattice_level(mecab));
+	RETURN_LONG((zend_long)mecab_get_lattice_level(mecab));
 }
 /* }}} */
 
@@ -1427,7 +1427,7 @@ PHP_METHOD(MeCab_Tagger, setLatticeLevel)
 	mecab_t *mecab = NULL;
 
 	/* declaration of the arguments */
-	long level = 0L;
+	zend_long level = 0L;
 
 	/* parse the arguments */
 	PHP_MECAB_PARSE_PARAMETERS("l", &level);
@@ -1894,11 +1894,11 @@ PHP_METHOD(MeCab_Tagger, dictionaryInfo)
 
 		add_assoc_string(&tmp, "filename", (char *)dicinfo->filename);
 		add_assoc_string(&tmp, "charset",  (char *)dicinfo->charset);
-		add_assoc_long(&tmp, "size",    (long)dicinfo->size);
-		add_assoc_long(&tmp, "type",    (long)dicinfo->type);
-		add_assoc_long(&tmp, "lsize",   (long)dicinfo->lsize);
-		add_assoc_long(&tmp, "rsize",   (long)dicinfo->rsize);
-		add_assoc_long(&tmp, "version", (long)dicinfo->version);
+		add_assoc_long(&tmp, "size",    (zend_long)dicinfo->size);
+		add_assoc_long(&tmp, "type",    (zend_long)dicinfo->type);
+		add_assoc_long(&tmp, "lsize",   (zend_long)dicinfo->lsize);
+		add_assoc_long(&tmp, "rsize",   (zend_long)dicinfo->rsize);
+		add_assoc_long(&tmp, "version", (zend_long)dicinfo->version);
 
 		add_next_index_zval(return_value, &tmp);
 
@@ -1955,20 +1955,20 @@ PHP_METHOD(MeCab_Node, toArray)
 	/* assign node info */
 	add_assoc_stringl(return_value, "surface", (char *)node->surface, (int)node->length);
 	add_assoc_stringl(return_value, "feature", (char *)node->feature, (int)strlen(node->feature));
-	add_assoc_long(return_value, "id",         (long)node->id);
-	add_assoc_long(return_value, "length",     (long)node->length);
-	add_assoc_long(return_value, "rlength",    (long)node->rlength);
-	add_assoc_long(return_value, "rcAttr",     (long)node->rcAttr);
-	add_assoc_long(return_value, "lcAttr",     (long)node->lcAttr);
-	add_assoc_long(return_value, "posid",      (long)node->posid);
-	add_assoc_long(return_value, "char_type",  (long)node->char_type);
-	add_assoc_long(return_value, "stat",       (long)node->stat);
-	add_assoc_bool(return_value, "isbest",     (long)node->isbest);
+	add_assoc_long(return_value, "id",         (zend_long)node->id);
+	add_assoc_long(return_value, "length",     (zend_long)node->length);
+	add_assoc_long(return_value, "rlength",    (zend_long)node->rlength);
+	add_assoc_long(return_value, "rcAttr",     (zend_long)node->rcAttr);
+	add_assoc_long(return_value, "lcAttr",     (zend_long)node->lcAttr);
+	add_assoc_long(return_value, "posid",      (zend_long)node->posid);
+	add_assoc_long(return_value, "char_type",  (zend_long)node->char_type);
+	add_assoc_long(return_value, "stat",       (zend_long)node->stat);
+	add_assoc_bool(return_value, "isbest",     (zend_long)node->isbest);
 	add_assoc_double(return_value, "alpha", (double)node->alpha);
 	add_assoc_double(return_value, "beta",  (double)node->beta);
 	add_assoc_double(return_value, "prob",  (double)node->prob);
-	add_assoc_long(return_value,   "wcost", (long)node->wcost);
-	add_assoc_long(return_value,   "cost",  (long)node->cost);
+	add_assoc_long(return_value,   "wcost", (zend_long)node->wcost);
+	add_assoc_long(return_value,   "cost",  (zend_long)node->cost);
 }
 /* }}} mecab_node_toarray */
 
@@ -2156,7 +2156,7 @@ PHP_METHOD(MeCab_Node, getFeature)
  */
 PHP_METHOD(MeCab_Node, getId)
 {
-	PHP_MECAB_NODE_RETURN_PROPERTY(LONG, (long)node->id);
+	PHP_MECAB_NODE_RETURN_PROPERTY(LONG, (zend_long)node->id);
 }
 /* }}} mecab_node_id */
 
@@ -2172,7 +2172,7 @@ PHP_METHOD(MeCab_Node, getId)
  */
 PHP_METHOD(MeCab_Node, getLength)
 {
-	PHP_MECAB_NODE_RETURN_PROPERTY(LONG, (long)node->length);
+	PHP_MECAB_NODE_RETURN_PROPERTY(LONG, (zend_long)node->length);
 }
 /* }}} mecab_node_length */
 
@@ -2188,7 +2188,7 @@ PHP_METHOD(MeCab_Node, getLength)
  */
 PHP_METHOD(MeCab_Node, getRLength)
 {
-	PHP_MECAB_NODE_RETURN_PROPERTY(LONG, (long)node->rlength);
+	PHP_MECAB_NODE_RETURN_PROPERTY(LONG, (zend_long)node->rlength);
 }
 /* }}} mecab_node_rlength */
 
@@ -2204,7 +2204,7 @@ PHP_METHOD(MeCab_Node, getRLength)
  */
 PHP_METHOD(MeCab_Node, getRcAttr)
 {
-	PHP_MECAB_NODE_RETURN_PROPERTY(LONG, (long)node->rcAttr);
+	PHP_MECAB_NODE_RETURN_PROPERTY(LONG, (zend_long)node->rcAttr);
 }
 /* }}} mecab_node_rcattr */
 
@@ -2220,7 +2220,7 @@ PHP_METHOD(MeCab_Node, getRcAttr)
  */
 PHP_METHOD(MeCab_Node, getLcAttr)
 {
-	PHP_MECAB_NODE_RETURN_PROPERTY(LONG, (long)node->lcAttr);
+	PHP_MECAB_NODE_RETURN_PROPERTY(LONG, (zend_long)node->lcAttr);
 }
 /* }}} mecab_node_lcattr */
 
@@ -2238,7 +2238,7 @@ PHP_METHOD(MeCab_Node, getLcAttr)
  */
 PHP_METHOD(MeCab_Node, getPosId)
 {
-	PHP_MECAB_NODE_RETURN_PROPERTY(LONG, (long)node->posid);
+	PHP_MECAB_NODE_RETURN_PROPERTY(LONG, (zend_long)node->posid);
 }
 /* }}} mecab_node_posid */
 
@@ -2254,7 +2254,7 @@ PHP_METHOD(MeCab_Node, getPosId)
  */
 PHP_METHOD(MeCab_Node, getCharType)
 {
-	PHP_MECAB_NODE_RETURN_PROPERTY(LONG, (long)node->char_type);
+	PHP_MECAB_NODE_RETURN_PROPERTY(LONG, (zend_long)node->char_type);
 }
 /* }}} mecab_node_char_type */
 
@@ -2275,7 +2275,7 @@ PHP_METHOD(MeCab_Node, getCharType)
  */
 PHP_METHOD(MeCab_Node, getStat)
 {
-	PHP_MECAB_NODE_RETURN_PROPERTY(LONG, (long)node->stat);
+	PHP_MECAB_NODE_RETURN_PROPERTY(LONG, (zend_long)node->stat);
 }
 /* }}} mecab_node_stat */
 
@@ -2355,7 +2355,7 @@ PHP_METHOD(MeCab_Node, getProb)
  */
 PHP_METHOD(MeCab_Node, getWCost)
 {
-	PHP_MECAB_NODE_RETURN_PROPERTY(LONG, (long)node->wcost);
+	PHP_MECAB_NODE_RETURN_PROPERTY(LONG, (zend_long)node->wcost);
 }
 /* }}} mecab_node_wcost */
 
@@ -2371,7 +2371,7 @@ PHP_METHOD(MeCab_Node, getWCost)
  */
 PHP_METHOD(MeCab_Node, getCost)
 {
-	PHP_MECAB_NODE_RETURN_PROPERTY(LONG, (long)node->cost);
+	PHP_MECAB_NODE_RETURN_PROPERTY(LONG, (zend_long)node->cost);
 }
 /* }}} mecab_node_cost */
 
@@ -2471,7 +2471,7 @@ PHP_METHOD(MeCab_Path, getProb)
  */
 PHP_METHOD(MeCab_Path, getCost)
 {
-	PHP_MECAB_PATH_RETURN_PROPERTY(LONG, (long)(path->cost));
+	PHP_MECAB_PATH_RETURN_PROPERTY(LONG, (zend_long)(path->cost));
 }
 /* }}} mecab_node_cost */
 
@@ -2559,20 +2559,20 @@ PHP_METHOD(MeCab_Node, __get)
 	}
 	if (!zend_binary_strcmp(name, len, ZEND_STRL("surface")))   RETURN_STRINGL((char *)node->surface, (int)node->length);
 	if (!zend_binary_strcmp(name, len, ZEND_STRL("feature")))   RETURN_STRING((char *)node->feature);
-	if (!zend_binary_strcmp(name, len, ZEND_STRL("id")))        RETURN_LONG((long)node->id);
-	if (!zend_binary_strcmp(name, len, ZEND_STRL("length")))    RETURN_LONG((long)node->length);
-	if (!zend_binary_strcmp(name, len, ZEND_STRL("rlength")))   RETURN_LONG((long)node->rlength);
-	if (!zend_binary_strcmp(name, len, ZEND_STRL("rcAttr")))    RETURN_LONG((long)node->rcAttr);
-	if (!zend_binary_strcmp(name, len, ZEND_STRL("lcAttr")))    RETURN_LONG((long)node->lcAttr);
-	if (!zend_binary_strcmp(name, len, ZEND_STRL("posid")))     RETURN_LONG((long)node->posid);
-	if (!zend_binary_strcmp(name, len, ZEND_STRL("char_type"))) RETURN_LONG((long)node->char_type);
-	if (!zend_binary_strcmp(name, len, ZEND_STRL("stat")))      RETURN_LONG((long)node->stat);
-	if (!zend_binary_strcmp(name, len, ZEND_STRL("isbest")))    RETURN_BOOL((long)node->isbest);
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("id")))        RETURN_LONG((zend_long)node->id);
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("length")))    RETURN_LONG((zend_long)node->length);
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("rlength")))   RETURN_LONG((zend_long)node->rlength);
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("rcAttr")))    RETURN_LONG((zend_long)node->rcAttr);
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("lcAttr")))    RETURN_LONG((zend_long)node->lcAttr);
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("posid")))     RETURN_LONG((zend_long)node->posid);
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("char_type"))) RETURN_LONG((zend_long)node->char_type);
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("stat")))      RETURN_LONG((zend_long)node->stat);
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("isbest")))    RETURN_BOOL((bool)node->isbest);
 	if (!zend_binary_strcmp(name, len, ZEND_STRL("alpha")))     RETURN_DOUBLE((double)node->alpha);
 	if (!zend_binary_strcmp(name, len, ZEND_STRL("beta")))      RETURN_DOUBLE((double)node->beta);
 	if (!zend_binary_strcmp(name, len, ZEND_STRL("prob")))      RETURN_DOUBLE((double)node->prob);
-	if (!zend_binary_strcmp(name, len, ZEND_STRL("wcost")))     RETURN_LONG((long)node->wcost);
-	if (!zend_binary_strcmp(name, len, ZEND_STRL("cost")))      RETURN_LONG((long)node->cost);
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("wcost")))     RETURN_LONG((zend_long)node->wcost);
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("cost")))      RETURN_LONG((zend_long)node->cost);
 
 	/* when going to fetch undefined property */
 	php_error_docref(NULL, E_NOTICE, "Undefined property (%s)", name);
@@ -2696,7 +2696,7 @@ PHP_METHOD(MeCab_Node, getIterator)
 PHP_METHOD(MeCab_Node, setTraverse)
 {
 	php_mecab_node_object *intern;
-	long traverse = 0;
+	zend_long traverse = 0;
 
 #if PHP_VERSION_ID >= 50300
 	zend_error_handling error_handling;
@@ -2718,9 +2718,9 @@ PHP_METHOD(MeCab_Node, setTraverse)
 
 	intern = PHP_MECAB_NODE_OBJECT_P(ZEND_THIS);
 
-	if (traverse == (long)TRAVERSE_NEXT ||
-		traverse == (long)TRAVERSE_ENEXT ||
-		traverse == (long)TRAVERSE_BNEXT)
+	if (traverse == (zend_long)TRAVERSE_NEXT ||
+		traverse == (zend_long)TRAVERSE_ENEXT ||
+		traverse == (zend_long)TRAVERSE_BNEXT)
 	{
 		intern->mode = (php_mecab_traverse_mode)traverse;
 	} else {
@@ -2815,7 +2815,7 @@ PHP_METHOD(MeCab_NodeIterator, key)
 		RETURN_NULL();
 	}
 
-	RETURN_LONG((long)node->id);
+	RETURN_LONG((zend_long)node->id);
 }
 /* }}} MeCab_NodeIterator::key */
 
@@ -2989,7 +2989,7 @@ PHP_METHOD(MeCab_Path, __get)
 		return;
 	}
 	if (!zend_binary_strcmp(name, len, ZEND_STRL("prob"))) RETURN_DOUBLE((double)(path->prob));
-	if (!zend_binary_strcmp(name, len, ZEND_STRL("cost"))) RETURN_LONG((long)(path->cost));
+	if (!zend_binary_strcmp(name, len, ZEND_STRL("cost"))) RETURN_LONG((zend_long)(path->cost));
 
 	/* when going to fetch undefined property */
 	php_error_docref(NULL, E_NOTICE, "Undefined property (%s)", name);
