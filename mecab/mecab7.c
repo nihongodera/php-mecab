@@ -793,7 +793,7 @@ php_mecab_node_get_sibling_wrapper(INTERNAL_FUNCTION_PARAMETERS, php_mecab_node_
 	/* parse the arguments */
 	PHP_MECAB_NODE_INTERNAL_FROM_PARAMETER();
 
-	php_mecab_node_get_sibling(return_value, getThis(), xnode, rel);
+	php_mecab_node_get_sibling(return_value, ZEND_THIS, xnode, rel);
 }
 /* }}} */
 
@@ -809,7 +809,7 @@ php_mecab_node_get_path_wrapper(INTERNAL_FUNCTION_PARAMETERS, php_mecab_node_rel
 	/* parse the arguments */
 	PHP_MECAB_NODE_INTERNAL_FROM_PARAMETER();
 
-	php_mecab_node_get_path(return_value, getThis(), xnode, rel);
+	php_mecab_node_get_path(return_value, ZEND_THIS, xnode, rel);
 }
 /* }}} */
 
@@ -825,7 +825,7 @@ php_mecab_path_get_sibling_wrapper(INTERNAL_FUNCTION_PARAMETERS, php_mecab_path_
 	/* parse the arguments */
 	PHP_MECAB_PATH_INTERNAL_FROM_PARAMETER();
 
-	php_mecab_path_get_sibling(return_value, getThis(), xpath, rel);
+	php_mecab_path_get_sibling(return_value, ZEND_THIS, xpath, rel);
 }
 /* }}} */
 
@@ -841,7 +841,7 @@ php_mecab_path_get_node_wrapper(INTERNAL_FUNCTION_PARAMETERS, php_mecab_path_rel
 	/* parse the arguments */
 	PHP_MECAB_PATH_INTERNAL_FROM_PARAMETER();
 
-	php_mecab_path_get_node(return_value, getThis(), xpath, rel);
+	php_mecab_path_get_node(return_value, ZEND_THIS, xpath, rel);
 }
 /* }}} */
 
@@ -1280,7 +1280,7 @@ PHP_METHOD(MeCab_Tagger, __construct)
 	}
 
 	{
-		const php_mecab_object *intern = PHP_MECAB_OBJECT_P(getThis());
+		const php_mecab_object *intern = PHP_MECAB_OBJECT_P(ZEND_THIS);
 		xmecab = intern->ptr;
 		if (xmecab->ptr != NULL) {
 			mecab_destroy(mecab);
@@ -1844,7 +1844,7 @@ PHP_METHOD(MeCab_Tagger, formatNode)
 		if (zend_parse_parameters(ZEND_NUM_ARGS(), "O", &node_object, ce_MeCab_Node) == FAILURE) {
 			return;
 		} else {
-			const php_mecab_object *intern = PHP_MECAB_OBJECT_P(getThis());
+			const php_mecab_object *intern = PHP_MECAB_OBJECT_P(ZEND_THIS);
 			const php_mecab_node_object *intern_node = PHP_MECAB_NODE_OBJECT_P(node_object);
 			xmecab = intern->ptr;
 			xnode = intern_node->ptr;
@@ -1928,7 +1928,7 @@ PHP_METHOD(MeCab_Tagger, dictionaryInfo)
 PHP_METHOD(MeCab_Node, toArray)
 {
 	/* declaration of the resources */
-	zval *object = getThis();
+	zval *object = ZEND_THIS;
 	php_mecab_node *xnode = NULL;
 	const mecab_node_t *node = NULL;
 
@@ -2519,7 +2519,7 @@ PHP_METHOD(MeCab_Node, __construct)
 PHP_METHOD(MeCab_Node, __get)
 {
 	/* declaration of the resources */
-	zval *object = getThis();
+	zval *object = ZEND_THIS;
 	php_mecab_node *xnode = NULL;
 	const mecab_node_t *node = NULL;
 
@@ -2614,7 +2614,7 @@ PHP_METHOD(MeCab_Node, __isset)
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "S", &zname) == FAILURE) {
 		return;
 	} else {
-		const php_mecab_node_object *intern = PHP_MECAB_NODE_OBJECT_P(getThis());
+		const php_mecab_node_object *intern = PHP_MECAB_NODE_OBJECT_P(ZEND_THIS);
 		xnode = intern->ptr;
 		node = xnode->ptr;
 		name = ZSTR_VAL(zname);
@@ -2671,7 +2671,7 @@ PHP_METHOD(MeCab_Node, getIterator)
 	php_mecab_node_object *newobj;
 	php_mecab_node *newnode;
 
-	intern = PHP_MECAB_NODE_OBJECT_P(getThis());
+	intern = PHP_MECAB_NODE_OBJECT_P(ZEND_THIS);
 	xnode = intern->ptr;
 	node = xnode->ptr;
 
@@ -2723,7 +2723,7 @@ PHP_METHOD(MeCab_Node, setTraverse)
 	php_std_error_handling();
 #endif
 
-	intern = PHP_MECAB_NODE_OBJECT_P(getThis());
+	intern = PHP_MECAB_NODE_OBJECT_P(ZEND_THIS);
 
 	if (traverse == (long)TRAVERSE_NEXT ||
 		traverse == (long)TRAVERSE_ENEXT ||
@@ -2777,7 +2777,7 @@ PHP_METHOD(MeCab_NodeIterator, current)
 	if (ZEND_NUM_ARGS() != 0) {
 		WRONG_PARAM_COUNT;
 	}
-	intern = PHP_MECAB_NODE_OBJECT_P(getThis());
+	intern = PHP_MECAB_NODE_OBJECT_P(ZEND_THIS);
 	xnode = intern->ptr;
 	node = xnode->ptr;
 
@@ -2814,7 +2814,7 @@ PHP_METHOD(MeCab_NodeIterator, key)
 	if (ZEND_NUM_ARGS() != 0) {
 		WRONG_PARAM_COUNT;
 	}
-	intern = PHP_MECAB_NODE_OBJECT_P(getThis());
+	intern = PHP_MECAB_NODE_OBJECT_P(ZEND_THIS);
 	xnode = intern->ptr;
 	node = xnode->ptr;
 
@@ -2846,7 +2846,7 @@ PHP_METHOD(MeCab_NodeIterator, next)
 	if (ZEND_NUM_ARGS() != 0) {
 		WRONG_PARAM_COUNT;
 	}
-	intern = PHP_MECAB_NODE_OBJECT_P(getThis());
+	intern = PHP_MECAB_NODE_OBJECT_P(ZEND_THIS);
 	xnode = intern->ptr;
 	node = xnode->ptr;
 
@@ -2889,7 +2889,7 @@ PHP_METHOD(MeCab_NodeIterator, rewind)
 	if (ZEND_NUM_ARGS() != 0) {
 		WRONG_PARAM_COUNT;
 	}
-	intern = PHP_MECAB_NODE_OBJECT_P(getThis());
+	intern = PHP_MECAB_NODE_OBJECT_P(ZEND_THIS);
 	xnode = intern->ptr;
 	xnode->ptr = intern->root;
 }
@@ -2915,7 +2915,7 @@ PHP_METHOD(MeCab_NodeIterator, valid)
 	if (ZEND_NUM_ARGS() != 0) {
 		WRONG_PARAM_COUNT;
 	}
-	intern = PHP_MECAB_NODE_OBJECT_P(getThis());
+	intern = PHP_MECAB_NODE_OBJECT_P(ZEND_THIS);
 	xnode = intern->ptr;
 	node = xnode->ptr;
 
@@ -2958,7 +2958,7 @@ PHP_METHOD(MeCab_Path, __construct)
 PHP_METHOD(MeCab_Path, __get)
 {
 	/* declaration of the resources */
-	zval *object = getThis();
+	zval *object = ZEND_THIS;
 	php_mecab_path *xpath = NULL;
 	const mecab_path_t *path = NULL;
 
@@ -3031,7 +3031,7 @@ PHP_METHOD(MeCab_Path, __isset)
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "S", &zname) == FAILURE) {
 		return;
 	} else {
-		const php_mecab_path_object *intern = PHP_MECAB_PATH_OBJECT_P(getThis());
+		const php_mecab_path_object *intern = PHP_MECAB_PATH_OBJECT_P(ZEND_THIS);
 		xpath = intern->ptr;
 		path = xpath->ptr;
 		name = ZSTR_VAL(zname);
