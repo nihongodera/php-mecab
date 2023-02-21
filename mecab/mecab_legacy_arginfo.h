@@ -1,5 +1,5 @@
 /* This is a generated file, edit the .stub.php file instead.
- * Stub hash: e0702471e50d18d72e0ac4d137326178eb0be34b */
+ * Stub hash: 443fc5b7a1dddcf4547b7be02ed24e8c82da1580 */
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_MeCab_version, 0, 0, 0)
 ZEND_END_ARG_INFO()
@@ -323,6 +323,18 @@ static const zend_function_entry class_MeCab_Path_methods[] = {
 	ZEND_ME(MeCab_Path, getProb, arginfo_class_MeCab_Path_getProb, ZEND_ACC_PUBLIC)
 	ZEND_FE_END
 };
+
+static void register_mecab_symbols(int module_number)
+{
+	REGISTER_STRING_CONSTANT("MeCab\\VERSION", (char *)mecab_version(), CONST_PERSISTENT | CONST_CS);
+	REGISTER_LONG_CONSTANT("MeCab\\NOR_NODE", MECAB_NOR_NODE, CONST_PERSISTENT | CONST_CS);
+	REGISTER_LONG_CONSTANT("MeCab\\UNK_NODE", MECAB_UNK_NODE, CONST_PERSISTENT | CONST_CS);
+	REGISTER_LONG_CONSTANT("MeCab\\BOS_NODE", MECAB_BOS_NODE, CONST_PERSISTENT | CONST_CS);
+	REGISTER_LONG_CONSTANT("MeCab\\EOS_NODE", MECAB_EOS_NODE, CONST_PERSISTENT | CONST_CS);
+	REGISTER_LONG_CONSTANT("MeCab\\SYS_DIC", MECAB_SYS_DIC, CONST_PERSISTENT | CONST_CS);
+	REGISTER_LONG_CONSTANT("MeCab\\USR_DIC", MECAB_USR_DIC, CONST_PERSISTENT | CONST_CS);
+	REGISTER_LONG_CONSTANT("MeCab\\UNK_DIC", MECAB_UNK_DIC, CONST_PERSISTENT | CONST_CS);
+}
 
 static zend_class_entry *register_class_MeCab_Tagger(void)
 {

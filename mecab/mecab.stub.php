@@ -7,6 +7,54 @@
 
 namespace MeCab;
 
+/** @var string
+ *  @cvalue (char *)mecab_version()
+ *  PHP<8 has constness problem
+ */
+const VERSION = UNKNOWN;
+
+/**
+ * @var int
+ * @cvalue MECAB_NOR_NODE
+ */
+const NOR_NODE = UNKNOWN;
+
+/**
+ * @var int
+ * @cvalue MECAB_UNK_NODE
+ */
+const UNK_NODE = UNKNOWN;
+
+/**
+ * @var int
+ * @cvalue MECAB_BOS_NODE
+ */
+const BOS_NODE = UNKNOWN;
+
+/**
+ * @var int
+ * @cvalue MECAB_EOS_NODE
+ */
+const EOS_NODE = UNKNOWN;
+
+/**
+ * @var int
+ * @cvalue MECAB_SYS_DIC
+ */
+const SYS_DIC = UNKNOWN;
+
+/**
+ * @var int
+ * @cvalue MECAB_USR_DIC
+ */
+const USR_DIC = UNKNOWN;
+
+/**
+ * @var int
+ * @cvalue MECAB_UNK_DIC
+ */
+const UNK_DIC = UNKNOWN;
+
 function version(): string {}
 function split(string $str, string $dicdir = null, string $userdic = null): array|false {}
 
