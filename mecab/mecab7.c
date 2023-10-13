@@ -67,12 +67,6 @@ static PHP_GINIT_FUNCTION(mecab);
 
 /* }}} */
 
-/* {{{ PHP function prototypes */
-
-static PHP_FUNCTION(mecab_new);
-
-/* }}} */
-
 /* {{{ internal function prototypes */
 
 /* allocate for mecab */
