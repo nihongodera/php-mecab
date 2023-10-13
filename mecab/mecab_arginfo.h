@@ -1,5 +1,5 @@
 /* This is a generated file, edit the .stub.php file instead.
- * Stub hash: 443fc5b7a1dddcf4547b7be02ed24e8c82da1580 */
+ * Stub hash: ffbfe7f18511e538eabf1925235e53c6fd5108c1 */
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_MeCab_version, 0, 0, IS_STRING, 0)
 ZEND_END_ARG_INFO()
@@ -105,7 +105,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_class_MeCab_Node_getIterator, 0, 0, 0)
 #endif
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_class_MeCab_Node_getBNext, 0, 0, MeCab\\Node, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_class_MeCab_Node_getBNext, 0, 0, MeCab\\Node, 1)
 ZEND_END_ARG_INFO()
 
 #define arginfo_class_MeCab_Node_getENext arginfo_class_MeCab_Node_getBNext
@@ -156,7 +156,7 @@ ZEND_END_ARG_INFO()
 
 #define arginfo_class_MeCab_Node_toString arginfo_class_MeCab_Node___toString
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_class_MeCab_Node_getLPath, 0, 0, MeCab\\Path, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_class_MeCab_Node_getLPath, 0, 0, MeCab\\Path, 1)
 ZEND_END_ARG_INFO()
 
 #define arginfo_class_MeCab_Node_getRPath arginfo_class_MeCab_Node_getLPath

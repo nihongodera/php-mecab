@@ -90,10 +90,10 @@ class Node implements \IteratorAggregate
     public function __toString(): string {}
     /** @tentative-return-type */
     public function getIterator(): NodeIterator {}
-    public function getBNext(): Node {}
-    public function getENext(): Node {}
-    public function getNext(): Node {}
-    public function getPrev(): Node {}
+    public function getBNext(): ?Node {}
+    public function getENext(): ?Node {}
+    public function getNext(): ?Node {}
+    public function getPrev(): ?Node {}
     public function getAlpha(): float {}
     public function getBeta(): float {}
     public function getCharType(): int {}
@@ -117,8 +117,8 @@ class Node implements \IteratorAggregate
      * @implementation-alias MeCab\Node::__toString
      */
     public function toString(): string {}
-    public function getLPath(): Path {}
-    public function getRPath(): Path {}
+    public function getLPath(): ?Path {}
+    public function getRPath(): ?Path {}
 }
 
 class NodeIterator implements \Iterator
@@ -141,10 +141,10 @@ class Path
     private function __construct() {}
     public function __get(string $name): mixed {}
     public function __isset(string $name): bool {}
-    public function getLNode(): Node {}
-    public function getRNode(): Node {}
-    public function getLNext(): Path {}
-    public function getRNext(): Path {}
+    public function getLNode(): ?Node {}
+    public function getRNode(): ?Node {}
+    public function getLNext(): ?Path {}
+    public function getRNext(): ?Path {}
     public function getCost(): int {}
     public function getProb(): float {}
 }
