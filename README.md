@@ -54,7 +54,7 @@ brew install mecab
 ```
 
 #### Windows
-Download the installer from this url: https://mecab.googlecode.com/files/mecab-0.996.exe
+There used to be an .exe installer available from [this page](http://taku910.github.io/mecab/#download), but it has been removed. You may need to build it from source.
 
 ### Install php-mecab
 First, verify that you have MeCab on your computer by testing it in the command line.  Type `mecab` and if you don't get an error, things are looking good.  If you get an error that looks something like this `param.cpp(69) [ifs] no such file or directory: /usr/local/lib/mecab/dic/ipadic/dicrc` you need to find your dictionary file and pass it as a parameter.  The directory is called 'ipadic-utf8' and needs to contain a file called 'unk.dic'.
@@ -73,24 +73,16 @@ EOS
 
 #### Linux
 Install the following dependencies:
-php5:
-php5-dev
+php8.4:
 libmecab-dev
 build-essential
 ```
-sudo apt-get install php5-dev libmecab-dev build-essential
-```
-php7:
-php7.0-dev
-libmecab-dev
-build-essential
-```
-sudo apt-get install php7.0-dev libmecab-dev build-essential
+sudo apt-get install php8.4 libmecab-dev build-essential
 ```
 
 Download the php-mecab source.
 ```
-wget https://github.com/rsky/php-mecab/archive/master.zip
+wget https://github.com/nihongodera/php-mecab/archive/master.zip
 ```
 
 You will need to find the package 'mecab-config'.  It is usually located at /usr/bin/mecab-config, but check to make sure. Let's use 'locate' because its easy.
@@ -131,21 +123,6 @@ sudo apt-get install mecab mecab-ipadic-utf8 mecab-utils libmecab-dev
 After completing this step, you should have a mecab.so.  Go to /usr/lib/php5/ and find the package with a name that looks is similar to this: 20131226. Have a look in that file and mecab.so should be in there.
 
 We now just need to enable the mod.
-For php5:
-Move to /etc/php5/mods-available/
-```
-cd /etc/php5/mods-available/
-```
-Next, create a new .ini file for mecab.
-```
-sudo touch mecab.ini
-echo "extension=mecab.so" | sudo tee -a mecab.ini
-```
-And then we need to activate the module.
-```
-sudo php5enmod mecab
-```
-___
 
 For php7:
 Move to /etc/php/php7.0/mods-available/
