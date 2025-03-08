@@ -18,7 +18,7 @@ bit more complicated but this way your custom code will always be in the
 generated code no matter how often you rerun CodeGen_PECL.
 
 
-BUILDING ON UNIX etc.
+BUILDING
 =====================
 
 To compile your new extension, you will have to execute the following steps:
@@ -31,22 +31,6 @@ To compile your new extension, you will have to execute the following steps:
 
 *) this is a general problem with "make test" and standalone extensions
    (that is being worked on) so please don't blame CodeGen_PECL for this
-
-
-
-BUILDING ON WINDOWS
-===================
-
-The extension provides the VisualStudio V6 project file
-
-  mecab.dsp
-To compile the extension you open this file using VisualStudio,
-select the apropriate configuration for your installation
-(either "Release_TS" or "Debug_TS") and create "php_mecab.dll"
-
-After successfull compilation you have to copy the newly
-created "php_mecab.dll" to the PHP
-extension directory (default: C:\PHP\extensions).
 
 
 TESTING

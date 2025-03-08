@@ -4,11 +4,17 @@
 #ifndef PHP_MECAB_COMPAT_H
 #define PHP_MECAB_COMPAT_H
 
+#define MSVC_VA_EXPAND(args) args
+
+#ifndef ZEND_THIS  /* PHP<7.4 */
+#define ZEND_THIS (&EX(This))
+#endif
+
 #define PHP_MECAB_INTERNAL_RSRC_FROM_PARAMETER() { \
 	if (ZEND_NUM_ARGS() != 0) { \
 		WRONG_PARAM_COUNT; \
 	} else { \
-		const php_mecab_object *intern = php_mecab_object_fetch_object(Z_OBJ_P(getThis())); \
+		const php_mecab_object *intern = php_mecab_object_fetch_object(Z_OBJ_P(ZEND_THIS)); \
 		xmecab = intern->ptr; \
 	} \
 }
@@ -21,7 +27,7 @@
 	if (ZEND_NUM_ARGS() != 0) { \
 		WRONG_PARAM_COUNT; \
 	} else { \
-		const php_mecab_##name##_object *intern = php_mecab_##name##_object_fetch_object(Z_OBJ_P(getThis())); \
+		const php_mecab_##name##_object *intern = php_mecab_##name##_object_fetch_object(Z_OBJ_P(ZEND_THIS)); \
 		x##name = intern->ptr; \
 	} \
 }
@@ -31,20 +37,20 @@
 	name = x##name->ptr;
 
 #define PHP_MECAB_PARSE_PARAMETERS(fmt, ...) { \
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, fmt, __VA_ARGS__) == FAILURE) { \
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), fmt, __VA_ARGS__) == FAILURE) { \
 		return; \
 	} else { \
-		const php_mecab_object *intern = php_mecab_object_fetch_object(Z_OBJ_P(getThis())); \
+		const php_mecab_object *intern = php_mecab_object_fetch_object(Z_OBJ_P(ZEND_THIS)); \
 		xmecab = intern->ptr; \
 	} \
 	mecab = xmecab->ptr; \
 }
 
 #define PHP_MECAB_PARSE_PARAMETERS2(name, fmt, ...) { \
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, fmt, __VA_ARGS__) == FAILURE) { \
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), fmt, __VA_ARGS__) == FAILURE) { \
 		return; \
 	} else { \
-		const php_mecab_##name##_object *intern = php_mecab_##name##_object_fetch_object(Z_OBJ_P(getThis())); \
+		const php_mecab_##name##_object *intern = php_mecab_##name##_object_fetch_object(Z_OBJ_P(ZEND_THIS)); \
 		x##name = intern->ptr; \
 	} \
 }
@@ -53,10 +59,10 @@
 	if (ZEND_NUM_ARGS() != 0) { \
 		WRONG_PARAM_COUNT; \
 	} else { \
-		const php_mecab_##name##_object *intern = php_mecab_##name##_object_fetch_object(Z_OBJ_P(getThis())); \
+		const php_mecab_##name##_object *intern = php_mecab_##name##_object_fetch_object(Z_OBJ_P(ZEND_THIS)); \
 		const php_mecab_##name *x##name = intern->ptr; \
 		const mecab_##name##_t *name = x##name->ptr; \
-		RETURN_##type(__VA_ARGS__); \
+		MSVC_VA_EXPAND(RETURN_##type(__VA_ARGS__)); \
 	} \
 }
 
@@ -73,8 +79,5 @@
 
 #define PHP_MECAB_NODE_RETURN_PROPERTY(type, ...) PHP_MECAB_RETURN_PROPERTY(node, type, __VA_ARGS__)
 #define PHP_MECAB_PATH_RETURN_PROPERTY(type, ...) PHP_MECAB_RETURN_PROPERTY(path, type, __VA_ARGS__)
-
-#define PHP_MECAB_REGISTER_NS_CONSTANT(name) \
-	REGISTER_NS_LONG_CONSTANT("MeCab", #name, MECAB_##name, CONST_PERSISTENT | CONST_CS)
 
 #endif /* PHP_MECAB_COMPAT_H */

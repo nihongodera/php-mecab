@@ -1,23 +1,51 @@
 // $ Id: $
 // vim:ft=javascript
 
-// TODO: check for MeCab version
+(function () {
 
 ARG_WITH('mecab', 'MeCab support', 'yes,shared');
 
 if (PHP_MECAB != "no") {
+  var exeName = 'mecab.exe';
+  var place = search_paths(exeName, makePaths('bin'), null);
+  if (place) {
+    var exePath = place === true ? exeName : place + '/' + exeName;
+    var verOutput = execute(exePath + ' --version');
+    var verString = verOutput.match(/^mecab of ((\d+\.\d+)\S*)$/m);
+    if (verString) {
+      if (parseFloat(verString[2]) < 0.99) {
+        ERROR("MeCab version 0.99 or later is required.");
+      }
+      ADD_FLAG('CFLAGS_MECAB', '/DPHP_MECAB_VERSION_STRING="' + verString[1] + '"');
+    }
+  }
 
-  if (!CHECK_LIB("mecab.lib", "mecab", PHP_MECAB)) {
+  if (!CHECK_LIB("libmecab.lib;mecab.lib", "mecab", makePaths('sdk'))) {
     ERROR("mecab: library 'mecab' not found");
   }
 
-  if (!CHECK_LIB("stdc++.lib", "mecab", PHP_MECAB)) {
-    ERROR("mecab: library 'stdc++' not found");
-  }
-
-  if (!CHECK_HEADER_ADD_INCLUDE("mecab.h", "CFLAGS_MECAB")) {
+  if (!CHECK_HEADER_ADD_INCLUDE("mecab.h", "CFLAGS_MECAB", makePaths('sdk'))) {
     ERROR("mecab: header 'mecab.h' not found");
   }
 
-  EXTENSION("mecab", "mecab.c");
+  if (PHP_VERSION >= 7) {
+    EXTENSION("mecab", "mecab7.c");
+  } else {
+    EXTENSION("mecab", "mecab5.c");
+  }
 }
+
+function makePaths(subDir)
+{
+  var paths = '';
+  if ((typeof TARGET_ARCH !== 'undefined' && TARGET_ARCH.match(/64$/))
+      || (typeof X64 !== 'undefined' && X64)) { // <= PHP 8.1
+    // try '64' suffix first, just in case
+    paths += PHP_MECAB + '/' + subDir + '64;';
+  }
+  paths += PHP_MECAB + '/' + subDir + ';';
+  paths += PHP_MECAB;
+  return paths;
+}
+
+})();
