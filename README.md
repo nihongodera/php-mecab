@@ -22,35 +22,6 @@ This project was originally forked from [rsky/php-mecab](https://github.com/rsky
 ## Installation
 (Please note that I am a Linux user and have only tested the Linux installation guide.  The Mac and Windows installation guides have been pieced together from other sources.)
 
-To compile the extension:
-```
-phpize
-```
-
-```
-./configure
-```
-You can specify the mecab path with `--with-mecab=/path/to/mecab-config`.
-For developers: `CFLAGS="-Wall -Wextra -Wno-unused-parameter" ./configure`.
- ```
- make && make test && sudo make install
- ```
-
-Ubuntu users can use the install script included in this repository to install mecab and php-mecab.
-Download the script:
-```
-curl -O https://raw.githubusercontent.com/nihongodera/php-mecab/master/install-php-mecab.sh
-```
-Make the file executable:
-```
-chmod +x install-php-mecab.sh
-```
-Execute the script:
-```
-./install-php-mecab.sh
-```
-For information about what the script does, see [here](https://github.com/nihongodera/limelight/wiki/Install-Script).
-
 ### Install MeCab
 Before installing php-mecab, you must install MeCab.
 
@@ -77,11 +48,10 @@ cd mecab-ipadic-2.7.0-20070801
 ```
 
 #### Mac OS X
-Both MeCab and the required dictionary (mecab-ipadic-utf8) are in MacPorts.  If that doesn't work, try downloading the source and building it yourself.  You can get the source and the dictionary from the following urls:
-https://mecab.googlecode.com/files/mecab-0.996.tar.gz
-https://mecab.googlecode.com/files/mecab-ipadic-2.7.0-20070801.tar.gz
-
-I believe you can build these files with Xcode.  Somebody correct me if I'm wrong.
+You cna install MeCab with brew:
+```
+brew install mecab
+```
 
 #### Windows
 Download the installer from this url: https://mecab.googlecode.com/files/mecab-0.996.exe
