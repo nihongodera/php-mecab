@@ -20,18 +20,18 @@ This project was originally forked from [rsky/php-mecab](https://github.com/rsky
   - [Contributing](#contributing)
 
 ## Installation
-(Please note that I am a Linux user and have only tested the Linux installation guide.  The Mac and Windows installation guides have been pieced together from other sources.)
+(Please note that I am a Linux user and have only tested the Linux installation guide. The Mac and Windows installation guides have been pieced together from other sources.)
 
 ### Install MeCab
 Before installing php-mecab, you must install MeCab.
 
 #### Linux
-Linux users can more than likely find MeCab in their distro repositories.  Simply install 'mecab' and the package 'mecab-ipadic-utf8'.  Ubuntu users can do this with the following command.
+Linux users can more than likely find MeCab in their distro repositories. Simply install 'mecab' and the package 'mecab-ipadic-utf8'. Ubuntu users can do this with the following command.
 ```
 sudo apt-get install mecab mecab-ipadic-utf8
 ```
 
-If that doesn't work, you can download the source and build it yourself.  Note that this will require the package 'build-essential'.
+If that doesn't work, you can download the source and build it yourself. Note that this will require the package 'build-essential'.
 First pull in MeCab.
 ```
 wget https://mecab.googlecode.com/files/mecab-0.996.tar.gz
@@ -57,7 +57,7 @@ brew install mecab
 There used to be an .exe installer available from [this page](http://taku910.github.io/mecab/#download), but it has been removed. You may need to build it from source.
 
 ### Install php-mecab
-First, verify that you have MeCab on your computer by testing it in the command line.  Type `mecab` and if you don't get an error, things are looking good.  If you get an error that looks something like this `param.cpp(69) [ifs] no such file or directory: /usr/local/lib/mecab/dic/ipadic/dicrc` you need to find your dictionary file and pass it as a parameter.  The directory is called 'ipadic-utf8' and needs to contain a file called 'unk.dic'.
+First, verify that you have MeCab on your computer by testing it in the command line. Type `mecab` and if you don't get an error, things are looking good. If you get an error that looks something like this `param.cpp(69) [ifs] no such file or directory: /usr/local/lib/mecab/dic/ipadic/dicrc` you need to find your dictionary file and pass it as a parameter. The directory is called 'ipadic-utf8' and needs to contain a file called 'unk.dic'.
 ```
 mecab --dicdir=/path/to/dictionary/dic/ipadic/
 ```
@@ -85,13 +85,13 @@ Download the php-mecab source.
 wget https://github.com/nihongodera/php-mecab/archive/master.zip
 ```
 
-You will need to find the package 'mecab-config'.  It is usually located at /usr/bin/mecab-config, but check to make sure. Let's use 'locate' because its easy.
+You will need to find the package 'mecab-config'. It is usually located at /usr/bin/mecab-config, but check to make sure. Let's use 'locate' because its easy.
 ```
 sudo updatedb
 locate mecab-config
 ```
 That should give you a path that looks something like /usr/bin/mecab-config.
-We should now be ready to build our package.  Put your mecab-config path after the --with-mecab-config option.
+We should now be ready to build our package. Put your mecab-config path after the --with-mecab-config option.
 ```
 unzip master.zip
 cd php-mecab-master/mecab
@@ -120,7 +120,7 @@ Then, reinstall everything:
 sudo apt-get install mecab mecab-ipadic-utf8 mecab-utils libmecab-dev
 ```
 
-After completing this step, you should have a mecab.so.  Go to /usr/lib/php5/ and find the package with a name that looks is similar to this: 20131226. Have a look in that file and mecab.so should be in there.
+After completing this step, you should have a mecab.so. Go to /usr/lib/php5/ and find the package with a name that looks is similar to this: 20131226. Have a look in that file and mecab.so should be in there.
 
 We now just need to enable the mod.
 
@@ -156,7 +156,7 @@ You should be ready to go.
 Instructions should be the same as for Linux, but you may require the package xcode in order to properly compile the source code.
 
 #### Windows
-Installing php-mecab is the same as installing any other php extension.  The following guide may be of use:
+Installing php-mecab is the same as installing any other php extension. The following guide may be of use:
 http://php.net/manual/en/install.windows.extensions.php
 
 According to one of the php-mecab readme files:
@@ -172,7 +172,7 @@ According to one of the php-mecab readme files:
 [Top](#contents)
 
 ## Usage
-php-mecab can be used functionally or as an object.  I prefer the OOP approach, but I will try to cover both approaches in this guide. Note that as of version 0.6.0, the procedural functions will not work in php 7.
+php-mecab can be used functionally or as an object.
   - [Initialization](#initialization)
   - [Splitting Strings](#splitting-strings)
   - [Parsing Strings](#parsing-strings)
@@ -180,13 +180,13 @@ php-mecab can be used functionally or as an object.  I prefer the OOP approach, 
   - [Basic MeCab](#basic-mecab)
 
 ### Initialization
-MeCab sometimes requires a dictionary directory to be passed to it on initialization.  The location of the directory seems to vary by system, so find 'ipadic-utf8' on your system and pass the full folder path.  Often, there will be more than one 'ipadic-utf8' folders on a system.  Make sure the one you use contains a file called 'unk.dic'.  Without this, mecab will fail to initialize.  Pass the the dictionary directory to MeCab with the console flag '-d' in an array.
+MeCab sometimes requires a dictionary directory to be passed to it on initialization. The location of the directory seems to vary by system, so find 'ipadic-utf8' on your system and pass the full folder path. Often, there will be more than one 'ipadic-utf8' folders on a system. Make sure the one you use contains a file called 'unk.dic'. Without this, mecab will fail to initialize. Pass the the dictionary directory to MeCab with the console flag '-d' in an array.
 
-The options passed to MeCab are the same as the options used in the command line program.  Send them to the constructor in an array.  Check the man page for MeCab for all available options.
+The options passed to MeCab are the same as the options used in the command line program. Send them to the constructor in an array. Check the man page for MeCab for all available options.
 
 #### Object Orientated
 New up a [MeCab\Tagger](#__constructarguments-persistent) object.
-Version 0.6.0:
+Version 1.0.0:
 ```php
 $mecab = new \MeCab\Tagger();
 ```
@@ -202,7 +202,7 @@ The variable $mecab will be a [MeCab\Tagger](#mecab\tagger) object.
 **Throughout this guide, when I refer to *$mecab* in the object orientated sections, it will be a Tagger object.**
 
 #### Functional
-Use the function [mecab_new()](#mecab_newarguments-persistent) to get a mecab resource.  As with the Object Orientated approach, you may or may not have to pass it a dictionary directory.
+Use the function [mecab_new()](#mecab_newarguments-persistent) to get a mecab resource. As with the Object Orientated approach, you may or may not have to pass it a dictionary directory.
 ```php
 $mecab = mecab_new(['-d', '/path/to/dictionary/mecab/dic/ipadic-utf8']);
 ```
@@ -212,7 +212,7 @@ The $mecab variable will be a resource of type 'mecab'.
 [Top](#contents)
 
 ### Splitting Strings
-Split methods only split a string into an array of morphemes.  They provide no information about the morphemes.
+Split methods only split a string into an array of morphemes. They provide no information about the morphemes.
 
 #### Object Orientated
 As of version 0.6.0, the split method is no longer on the Tagger object. The following only applies to previous versions.
@@ -235,7 +235,7 @@ Array
 
 ```
 
-If you have an instance of MeCab\Tagger you can also call the method on the object.  You will still need to pass the dictionary directory.
+If you have an instance of MeCab\Tagger you can also call the method on the object. You will still need to pass the dictionary directory.
 ```php
 $split = $mecab->split('たこ焼きが食べたい');
 
@@ -253,7 +253,7 @@ Array
 ```
 
 #### Functional
-Use the funtion [mecab_split()](#mecab_splitstring-dic_dir-user_dic-filter-persistent).  It may or may not require the dictionary directory to be passed.
+Use the funtion [mecab_split()](#mecab_splitstring-dic_dir-user_dic-filter-persistent). It may or may not require the dictionary directory to be passed.
 ```php
 $split = mecab_split('パンダをいくらで買いますか');
 ```
@@ -279,10 +279,10 @@ Array
 [Top](#contents)
 
 ### Parsing Strings
-MeCab will parse strings of Japanese text and return results in either string form or as a MeCab\Node.  The MeCab\Node class seems a little awkward and difficult to deal with at first, but they give the user a lot of power and make parsing results a little easier.
+MeCab will parse strings of Japanese text and return results in either string form or as a MeCab\Node. The MeCab\Node class seems a little awkward and difficult to deal with at first, but they give the user a lot of power and make parsing results a little easier.
 
 #### Object Orientated
-To parse a string and get results in string form, a couple options exist.  The first is the [parse()](#parsestring-length-output_length) method.
+To parse a string and get results in string form, a couple options exist. The first is the [parse()](#parsestring-length-output_length) method.
 ```php
 $results = $mecab->parse('チョコレートがやめられない');
 
@@ -354,7 +354,7 @@ resource(5) of type (node)
 ###Using Nodes
 Nodes make it easy to access the information MeCab provides and give users powerful ways to navigate through results.
 
-The node returned from the parseToNode() methods discussed in the previous section is the first node in the series and only represents the first morpheme.  In order to get information about the entire string, it is necessary to walk through all the nodes in the series.  But before we tackle that, lets take a quick look at some of more useful methods we have at our disposal.
+The node returned from the parseToNode() methods discussed in the previous section is the first node in the series and only represents the first morpheme. In order to get information about the entire string, it is necessary to walk through all the nodes in the series. But before we tackle that, lets take a quick look at some of more useful methods we have at our disposal.
 
 #### Object Orientated
   - [getPrev()](#getprev): Get the previous node in the series.
@@ -372,7 +372,7 @@ The node returned from the parseToNode() methods discussed in the previous secti
   - [mecab_node_length()](#mecab_node_lengthnode): Get the length of the node's surface.
   - [mecab_node_toarray()](#mecab_node_toarraynode-dump_all): Get all the node's elements as an associative array.
 
-There are several other methods available, but these are the most useful at this point.  For a full list of methods, see the [Classes and Functions](#classes-and-functions) section of this guide.
+There are several other methods available, but these are the most useful at this point. For a full list of methods, see the [Classes and Functions](#classes-and-functions) section of this guide.
 So let's see how we can walk through the nodes and extract the information we need.
 
 #### Object Orientated
@@ -382,7 +382,7 @@ The first way simply walks through the nodes with a foreach loop.
 $node = $mecab->parseToNode('カレーライスにしようかな');
 
 foreach ($node as $n) {
-    echo $n->getFeature() . "\n";
+ . echo $n->getFeature() . "\n";
 }
 
 // Results
@@ -395,12 +395,12 @@ BOS/EOS,*,*,*,*,*,*,*,*
 助詞,終助詞,*,*,*,*,な,ナ,ナ
 BOS/EOS,*,*,*,*,*,*,*,*
 ```
-This isn't necessairly a bad way to do it, but it's a little too magical for my liking.  If $node is the first node in the series (and it is, you can var_dump and verify this), it doesn't make sense to loop through each $node as $n where $node is a single node and $n is also a single node.  Instead, I prefer to use MeCab\Node's methods to explicitly define what I am doing.
+This isn't necessairly a bad way to do it, but it's a little too magical for my liking. If $node is the first node in the series (and it is, you can var_dump and verify this), it doesn't make sense to loop through each $node as $n where $node is a single node and $n is also a single node. Instead, I prefer to use MeCab\Node's methods to explicitly define what I am doing.
 ```php
 $node = $mecab->parseToNode('これの方がいい');
 
 do {
-    echo $node->getFeature() . "\n";
+ . echo $node->getFeature() . "\n";
 } while ($node = $node->getNext());
 
 // Results
@@ -417,7 +417,7 @@ We can extract the logic to a general purpose looping function.
 ```php
 function walkThroughNodes(\Mecab\Node $node, $callback)
 {
-    do {
+ . do {
         $callback($node);
     } while ($node = $node->getNext());
 }
@@ -427,7 +427,7 @@ We can then pass our walkThroughNodes function a closure to tell it what to do w
 $node = $mecab->parseToNode('これの方がいい');
 
 walkThroughNodes($node, function($node) {
-    echo $node->getSurface() . "\n";
+ . echo $node->getSurface() . "\n";
 });
 
 // Results
@@ -439,15 +439,15 @@ walkThroughNodes($node, function($node) {
 いい
 
 ```
-Now we have never have to worry about a basic walkthough again.  We can simply pass our walkThroughNodes function a node and a callback.
+Now we have never have to worry about a basic walkthough again. We can simply pass our walkThroughNodes function a node and a callback.
 
 #### Functional
-As mentioned in the Object Orientated section above, we can simply walk through the nodes with a foreach loop, but I don't like that approach.  Instead, lets use MeCab's nodes to our advantage.
+As mentioned in the Object Orientated section above, we can simply walk through the nodes with a foreach loop, but I don't like that approach. Instead, lets use MeCab's nodes to our advantage.
 ```php
 $node = mecab_sparse_tonode($mecab, 'ビール飲みたい');
 
 do {
-    echo mecab_node_surface($node) . "\n";
+ . echo mecab_node_surface($node) . "\n";
 } while ($node = mecab_node_next($node));
 
 // Results
@@ -461,7 +461,7 @@ Like we did in the Object Orientated section, lets extract this to a function th
 ```php
 function walkThroughNodes($node, $callback)
 {
-    do {
+ . do {
         $callback($node);
     } while ($node = mecab_node_next($node));
 }
@@ -471,7 +471,7 @@ We can cuse our walkThroughNodes function like this.
 $node = mecab_sparse_tonode($mecab, 'ビール飲みたい');
 
 walkThroughNodes($node, function ($node) {
-    echo mecab_node_surface($node) . "\n";
+ . echo mecab_node_surface($node) . "\n";
 });
 
 // Results
@@ -495,8 +495,8 @@ echo $string;
 行く    動詞,自立,*,*,五段・カ行促音便,基本形,行く,イク,イク
 EOS
 ```
-Commonly in MeCab you will see BOS and EOS.  These mean 'Beginning of Sentence' and 'End of Sentence', respectively.
-In output lines, there are generally two parts, the surface and the feature.  The surface is the original morpheme and the feature is MeCab info.  In our case, '行く' is the surface and '動詞,自立,*,*,五段・カ行促音便,基本形,行く,イク,イク' is the feature.  Remember you can use nodes to easily extract this information.
+Commonly in MeCab you will see BOS and EOS. These mean 'Beginning of Sentence' and 'End of Sentence', respectively.
+In output lines, there are generally two parts, the surface and the feature. The surface is the original morpheme and the feature is MeCab info. In our case, '行く' is the surface and '動詞,自立,*,*,五段・カ行促音便,基本形,行く,イク,イク' is the feature. Remember you can use nodes to easily extract this information.
 
 The feature is a comma seperated string with nine sections.
 Section 1: Main part of speech category
@@ -564,22 +564,22 @@ Main class used to parse text.
 Return Mecab version.
 ```php
 /**
- * @return      string
+ * @return   . string
  */
 ```
 
 ###### split($string, $dic_dir, $user_dic, $filter, $persistent) [static]
 Only on versions prior to 0.6.0.
-Split string into array of morphemes.  Usually requires the dictionary directory to be passed as a parameter.
+Split string into array of morphemes. Usually requires the dictionary directory to be passed as a parameter.
 ```php
 /**
- * @param       string          $string         String to split.
- * @param       string          $dic_dir        Path to dictionary directory. (Optional)
- * @param       string          $user_dic       Path to user dictionary. (Optional)
- * @param       callback        $filter         Filter function or method. (Optional)
- * @param       boolean         $persistent     (Optional)
+ * @param    . string          $string      . String to split.
+ * @param    . string          $dic_dir     . Path to dictionary directory. (Optional)
+ * @param    . string          $user_dic    . Path to user dictionary. (Optional)
+ * @param    . callback        $filter      . Filter function or method. (Optional)
+ * @param    . boolean         $persistent     (Optional)
  *
- * @return      array
+ * @return   . array
  */
 ```
 Example
@@ -601,10 +601,10 @@ Array
 Construct class instance.
 ```php
 /**
- * @param       array           $arguments      Command line arguments.
- * @param       boolean         $persistent     (Optional)
+ * @param    . array           $arguments   . Command line arguments.
+ * @param    . boolean         $persistent     (Optional)
  *
- * @return      MeCab\Tagger
+ * @return   . MeCab\Tagger
  */
 ```
 
@@ -612,7 +612,7 @@ Construct class instance.
 Get current partial parsing mode state.
 ```php
 /**
- * @return      boolean
+ * @return   . boolean
  */
 ```
 
@@ -620,7 +620,7 @@ Get current partial parsing mode state.
 Set partial parsing mode.
 ```php
 /**
- * @param       boolean         $bool           Partial parsing mode.
+ * @param    . boolean         $bool        . Partial parsing mode.
  */
 ```
 
@@ -628,7 +628,7 @@ Set partial parsing mode.
 Get current temparature parameter theta.
 ```php
 /**
- * @return      float
+ * @return   . float
  */
 ```
 
@@ -636,7 +636,7 @@ Get current temparature parameter theta.
 Set temparature parameter theta.
 ```php
 /**
- * @param       float/int       $theta          Temparature parameter theta.
+ * @param    . float/int       $theta       . Temparature parameter theta.
  */
 ```
 
@@ -644,7 +644,7 @@ Set temparature parameter theta.
 Get current lattice level.
 ```php
 /**
- * @return      int
+ * @return   . int
  */
 ```
 
@@ -652,7 +652,7 @@ Get current lattice level.
 Set lattice level.
 ```php
 /**
- * @param       int             $level          Lattice level.
+ * @param    . int             $level       . Lattice level.
  */
 ```
 
@@ -660,7 +660,7 @@ Set lattice level.
 Get all-morphs output mode.
 ```php
 /**
- * @return      bool
+ * @return   . bool
  */
 ```
 
@@ -668,7 +668,7 @@ Get all-morphs output mode.
 Set all-morphs output mode.
 ```php
 /**
- * @param       bool            $bool           All-morphs output mode.
+ * @param    . bool            $bool        . All-morphs output mode.
  */
 ```
 
@@ -676,11 +676,11 @@ Set all-morphs output mode.
 Parse string and output results as string.
 ```php
 /**
- * @param       string          $string         String to be parsed.
- * @param       int             $length         Length to be analyzed. (Optional)
- * @param       int             $output_length  Maximum length of output. (Optional)
+ * @param    . string          $string      . String to be parsed.
+ * @param    . int             $length      . Length to be analyzed. (Optional)
+ * @param    . int             $output_lengt. Maximum length of output. (Optional)
  *
- * @return      string
+ * @return   . string
  */
 ```
 Example
@@ -700,11 +700,11 @@ EOS
 Parse string and output results as string.
 ```php
 /**
- * @param       string          $string         String to be parsed.
- * @param       int             $length         Length to be analyzed. (Optional)
- * @param       int             $output_length  Maximum length of output. (Optional)
+ * @param    . string          $string      . String to be parsed.
+ * @param    . int             $length      . Length to be analyzed. (Optional)
+ * @param    . int             $output_lengt. Maximum length of output. (Optional)
  *
- * @return      string
+ * @return   . string
  */
 ```
 Example
@@ -724,10 +724,10 @@ EOS
 Parse string and output results as MeCab/Node.
 ```php
 /**
- * @param       string          $string         String to be parsed.
- * @param       int             $length         Length to be analyzed. (Optional)
+ * @param    . string          $string      . String to be parsed.
+ * @param    . int             $length      . Length to be analyzed. (Optional)
  *
- * @return      MeCab/Node
+ * @return   . MeCab/Node
  */
 ```
 Example
@@ -760,15 +760,15 @@ Array
 ```
 
 ###### parseNBest($n, $string, $length, $output_length)
-Parse given sentence and output N-best results as string.  This method causes seg faults for me.
+Parse given sentence and output N-best results as string. This method causes seg faults for me.
 ```php
 /**
- * @param       int             $n              Number of results to obtain.
- * @param       string          $string         String to be parsed.
- * @param       int             $length         Length to be analyzed. (Optional)
- * @param       int             $output_length  Maximum length of output. (Optional)
+ * @param    . int             $n           . Number of results to obtain.
+ * @param    . string          $string      . String to be parsed.
+ * @param    . int             $length      . Length to be analyzed. (Optional)
+ * @param    . int             $output_lengt. Maximum length of output. (Optional)
  *
- * @return      string
+ * @return   . string
  */
 ```
 
@@ -776,10 +776,10 @@ Parse given sentence and output N-best results as string.  This method causes se
 Initialize N-best enumeration with a sentence.
 ```php
 /**
- * @param       string          $string         String to be parsed.
- * @param       int             $length         Length to be analyzed. (Optional)
+ * @param    . string          $string      . String to be parsed.
+ * @param    . int             $length      . Length to be analyzed. (Optional)
 
- * @return      boolean
+ * @return   . boolean
  */
 ```
 
@@ -787,9 +787,9 @@ Initialize N-best enumeration with a sentence.
 Get the next result of N-Best as a string.
 ```php
 /**
- * @param       int             $output_length  Maximum length of output. (Optional)
+ * @param    . int             $output_lengt. Maximum length of output. (Optional)
  *
- * @return      string
+ * @return   . string
  */
 ```
 
@@ -797,7 +797,7 @@ Get the next result of N-Best as a string.
 Get the next result of N-Best as a node.
 ```php
 /**
- * @return      MeCab\Node
+ * @return   . MeCab\Node
  */
 ```
 
@@ -805,9 +805,9 @@ Get the next result of N-Best as a node.
 Format a node to a string.
 ```php
 /**
- * @param       MeCab\Node      $node           Node to be formatted.
+ * @param    . MeCab\Node      $node        . Node to be formatted.
  *
- * @return      string
+ * @return   . string
  */
 ```
 
@@ -815,7 +815,7 @@ Format a node to a string.
 Return array of dictionary info.
 ```php
 /**
- * @return      array
+ * @return   . array
  */
 ```
 
@@ -855,7 +855,7 @@ Returned by parseToNode method on Mecab\Tagger.
 Return MeCab\NodeIterator.
 ```php
 /**
- * @return      MeCab\NodeIterator
+ * @return   . MeCab\NodeIterator
  */
 ```
 
@@ -863,55 +863,55 @@ Return MeCab\NodeIterator.
 Set the traverse mode.
 ```php
 /**
- * @param       long            $mode           Traverse mode.
+ * @param    . long            $mode        . Traverse mode.
  */
 ```
 
 ###### getPrev()
-Get the previous node.  Return NULL if none.
+Get the previous node. Return NULL if none.
 ```php
 /**
- * @return      MeCab\Node
+ * @return   . MeCab\Node
  */
 ```
 
 ###### getNext()
-Get the next node.  Return NULL if none.
+Get the next node. Return NULL if none.
 ```php
 /**
- * @return      MeCab\Node
+ * @return   . MeCab\Node
  */
 ```
 
 ###### getENext()
-Get the next node which has same end point as the given node.  Return NULL if none.
+Get the next node which has same end point as the given node. Return NULL if none.
 ```php
 /**
- * @return      MeCab\Node
+ * @return   . MeCab\Node
  */
 ```
 
 ###### getBNext()
-Get the next node which has same beginning point as the given node.  Return NULL if none.
+Get the next node which has same beginning point as the given node. Return NULL if none.
 ```php
 /**
- * @return      MeCab\Node
+ * @return   . MeCab\Node
  */
 ```
 
 ###### getRPath()
-Get the next node which has same end point as the given node.  Return NULL if none.
+Get the next node which has same end point as the given node. Return NULL if none.
 ```php
 /**
- * @return      MeCab\Path
+ * @return   . MeCab\Path
  */
 ```
 
 ###### getLPath()
-Get the next node which has same beginning point as the given node.  Return NULL if none.
+Get the next node which has same beginning point as the given node. Return NULL if none.
 ```php
 /**
- * @return      MeCab\Path
+ * @return   . MeCab\Path
  */
 ```
 
@@ -919,7 +919,7 @@ Get the next node which has same beginning point as the given node.  Return NULL
 Get the surface of the node.
 ```php
 /**
- * @return      string
+ * @return   . string
  */
 ```
 
@@ -927,7 +927,7 @@ Get the surface of the node.
 Get the feature of the node.
 ```php
 /**
- * @return      string
+ * @return   . string
  */
 ```
 
@@ -935,7 +935,7 @@ Get the feature of the node.
 Get the ID of the node.
 ```php
 /**
- * @return      int
+ * @return   . int
  */
 ```
 
@@ -943,7 +943,7 @@ Get the ID of the node.
 Get the length of the node's surface.
 ```php
 /**
- * @return      int
+ * @return   . int
  */
 ```
 
@@ -951,7 +951,7 @@ Get the length of the node's surface.
 Get the length of the node's surface including it's leading whitespace.
 ```php
 /**
- * @return      int
+ * @return   . int
  */
 ```
 
@@ -959,7 +959,7 @@ Get the length of the node's surface including it's leading whitespace.
 Get the ID of the right context.
 ```php
 /**
- * @return      int
+ * @return   . int
  */
 ```
 
@@ -967,7 +967,7 @@ Get the ID of the right context.
 Get the ID of the left context.
 ```php
 /**
- * @return      int
+ * @return   . int
  */
 ```
 
@@ -975,7 +975,7 @@ Get the ID of the left context.
 Get the ID of the part of speech.
 ```php
 /**
- * @return      int
+ * @return   . int
  */
 ```
 
@@ -983,7 +983,7 @@ Get the ID of the part of speech.
 Get the type of character.
 ```php
 /**
- * @return      int
+ * @return   . int
  */
 ```
 
@@ -991,7 +991,7 @@ Get the type of character.
 Get the status of the node.
 ```php
 /**
- * @return      int
+ * @return   . int
  */
 ```
 0: Normal, MECAB_NOR_NODE
@@ -1003,7 +1003,7 @@ Get the status of the node.
 Get the forward log probability.
 ```php
 /**
- * @return      float
+ * @return   . float
  */
 ```
 
@@ -1011,7 +1011,7 @@ Get the forward log probability.
 Get the backward probability log.
 ```php
 /**
- * @return      float
+ * @return   . float
  */
 ```
 
@@ -1019,7 +1019,7 @@ Get the backward probability log.
 Get the word arising cost.
 ```php
 /**
- * @return      int
+ * @return   . int
  */
 ```
 
@@ -1027,7 +1027,7 @@ Get the word arising cost.
 Get the cumulative cost of the node.
 ```php
 /**
- * @return      int
+ * @return   . int
  */
 ```
 
@@ -1035,7 +1035,7 @@ Get the cumulative cost of the node.
 Get the marginal probability of the node.
 ```php
 /**
- * @return      float
+ * @return   . float
  */
 ```
 
@@ -1043,7 +1043,7 @@ Get the marginal probability of the node.
 Determine whether the node is the best solution.
 ```php
 /**
- * @return      boolean
+ * @return   . boolean
  */
 ```
 
@@ -1051,9 +1051,9 @@ Determine whether the node is the best solution.
 Get all elements of the node as an associative array.
 ```php
 /**
- * @param       boolean         $dump_all       Dump all related nodes if true. (Optional)
+ * @param    . boolean         $dump_all    . Dump all related nodes if true. (Optional)
  *
- * @return      array
+ * @return   . array
  */
 ```
 
@@ -1061,7 +1061,7 @@ Get all elements of the node as an associative array.
 Get the formatted string of the node.
 ```php
 /**
- * @return      string
+ * @return   . string
  */
 ```
 
@@ -1081,7 +1081,7 @@ Returned by getRPath and getLPath methods on MeCab/Node class.
 Get the rnext path. Return NULL if none.
 ```php
 /**
- * @return      MeCab/Path
+ * @return   . MeCab/Path
  */
 ```
 
@@ -1089,7 +1089,7 @@ Get the rnext path. Return NULL if none.
 Get the lext path. Return NULL if none.
 ```php
 /**
- * @return      MeCab/Path
+ * @return   . MeCab/Path
  */
 ```
 
@@ -1097,7 +1097,7 @@ Get the lext path. Return NULL if none.
 Get the rnode. Return NULL if none.
 ```php
 /**
- * @return      MeCab/Node
+ * @return   . MeCab/Node
  */
 ```
 
@@ -1105,7 +1105,7 @@ Get the rnode. Return NULL if none.
 Get the lnode. Return NULL if none.
 ```php
 /**
- * @return      MeCab/Node
+ * @return   . MeCab/Node
  */
 ```
 
@@ -1113,7 +1113,7 @@ Get the lnode. Return NULL if none.
 Get the marginal probability of the path.
 ```php
 /**
- * @return      float
+ * @return   . float
  */
 ```
 
@@ -1121,7 +1121,7 @@ Get the marginal probability of the path.
 Get the cumulative cost of the path.
 ```php
 /**
- * @return      int
+ * @return   . int
  */
 ```
 
@@ -1140,14 +1140,14 @@ Node iterator class.
 Return the current element.
 ```php
 /**
- * @return      MeCab\Node
+ * @return   . MeCab\Node
  */
 ```
 
 ###### key()
 ```php
 /**
- * @return      int
+ * @return   . int
  */
 ```
 
@@ -1161,7 +1161,7 @@ Set pointer to beginning.
 Check if there is a current element after calls to rewind() or next().
 ```php
 /**
- * @return   boolean
+ * @return. boolean
  */
 ```
 
@@ -1224,7 +1224,7 @@ Return MeCab version.
 Return MeCab version.
 ```php
 /**
- * @return      string
+ * @return   . string
  */
 ```
 
@@ -1232,13 +1232,13 @@ Return MeCab version.
 Split string into array of morphemes.
 ```php
 /**
- * @param       string          $string         String to split.
- * @param       string          $dic_dir        Path to dictionary directory. (Optional)
- * @param       string          $user_dic       Path to user dictionary. (Optional)
- * @param       callback        $filter         Filter function or method. (Optional)
- * @param       boolean         $persistent     (Optional)
+ * @param    . string          $string      . String to split.
+ * @param    . string          $dic_dir     . Path to dictionary directory. (Optional)
+ * @param    . string          $user_dic    . Path to user dictionary. (Optional)
+ * @param    . callback        $filter      . Filter function or method. (Optional)
+ * @param    . boolean         $persistent     (Optional)
  *
- * @return      array
+ * @return   . array
  */
 ```
 
@@ -1246,10 +1246,10 @@ Split string into array of morphemes.
 Create new MeCab resource.
 ```php
 /**
- * @param       array           $arguments      Command line arguments.
- * @param       boolean         $persistent     (Optional)
+ * @param    . array           $arguments   . Command line arguments.
+ * @param    . boolean         $persistent     (Optional)
  *
- * @return      MeCab
+ * @return   . MeCab
  */
 ```
 
@@ -1257,7 +1257,7 @@ Create new MeCab resource.
 Free the tagger.
 ```php
 /**
- * @param       MeCab           $mecab          MeCab resource.
+ * @param    . MeCab           $mecab       . MeCab resource.
  */
 ```
 
@@ -1265,9 +1265,9 @@ Free the tagger.
 Get current partial parsing mode state.
 ```php
 /**
- * @param       MeCab           $mecab          MeCab resource.
+ * @param    . MeCab           $mecab       . MeCab resource.
  *
- * @return      boolean
+ * @return   . boolean
  */
 ```
 
@@ -1275,8 +1275,8 @@ Get current partial parsing mode state.
 Set partial parsing mode.
 ```php
 /**
- * @param       MeCab           $mecab          MeCab resource.
- * @param       boolean         $bool           Partial parsing mode.
+ * @param    . MeCab           $mecab       . MeCab resource.
+ * @param    . boolean         $bool        . Partial parsing mode.
  */
 ```
 
@@ -1284,9 +1284,9 @@ Set partial parsing mode.
 Get current temparature parameter theta.
 ```php
 /**
- * @param       MeCab           $mecab          MeCab resource.
+ * @param    . MeCab           $mecab       . MeCab resource.
  *
- * @return      float
+ * @return   . float
  */
 ```
 
@@ -1294,8 +1294,8 @@ Get current temparature parameter theta.
 Set temparature parameter theta.
 ```php
 /**
- * @param       MeCab           $mecab          MeCab resource.
- * @param       float/int       $theta          Temparature parameter theta.
+ * @param    . MeCab           $mecab       . MeCab resource.
+ * @param    . float/int       $theta       . Temparature parameter theta.
  */
 ```
 
@@ -1303,9 +1303,9 @@ Set temparature parameter theta.
 Get current lattice level.
 ```php
 /**
- * @param       MeCab           $mecab          MeCab resource.
+ * @param    . MeCab           $mecab       . MeCab resource.
  *
- * @return      int
+ * @return   . int
  */
 ```
 
@@ -1313,8 +1313,8 @@ Get current lattice level.
 Set lattice level.
 ```php
 /**
- * @param       MeCab           $mecab          MeCab resource.
- * @param       int             $level          Lattice level.
+ * @param    . MeCab           $mecab       . MeCab resource.
+ * @param    . int             $level       . Lattice level.
  */
 ```
 
@@ -1322,9 +1322,9 @@ Set lattice level.
 Get all-morphs output mode.
 ```php
 /**
- * @param       MeCab           $mecab          MeCab resource.
+ * @param    . MeCab           $mecab       . MeCab resource.
  *
- * @return      bool
+ * @return   . bool
  */
 ```
 
@@ -1332,8 +1332,8 @@ Get all-morphs output mode.
 Set all-morphs output mode.
 ```php
 /**
- * @param       MeCab           $mecab          MeCab resource.
- * @param       bool            $bool           All-morphs output mode.
+ * @param    . MeCab           $mecab       . MeCab resource.
+ * @param    . bool            $bool        . All-morphs output mode.
  */
 ```
 
@@ -1341,12 +1341,12 @@ Set all-morphs output mode.
 Parse string and output results as string.
 ```php
 /**
- * @param       MeCab           $mecab          MeCab resource.
- * @param       string          $string         String to be parsed.
- * @param       int             $length         Length to be analyzed. (Optional)
- * @param       int             $output_length  Maximum length of output. (Optional)
+ * @param    . MeCab           $mecab       . MeCab resource.
+ * @param    . string          $string      . String to be parsed.
+ * @param    . int             $length      . Length to be analyzed. (Optional)
+ * @param    . int             $output_lengt. Maximum length of output. (Optional)
  *
- * @return      string
+ * @return   . string
  */
 ```
 
@@ -1354,11 +1354,11 @@ Parse string and output results as string.
 Parse string and output results as MeCab/Node.
 ```php
 /**
- * @param       MeCab           $mecab          MeCab resource.
- * @param       string          $string         String to be parsed.
- * @param       int             $length         Length to be analyzed. (Optional)
+ * @param    . MeCab           $mecab       . MeCab resource.
+ * @param    . string          $string      . String to be parsed.
+ * @param    . int             $length      . Length to be analyzed. (Optional)
  *
- * @return      MeCab/Node
+ * @return   . MeCab/Node
  */
 ```
 
@@ -1366,13 +1366,13 @@ Parse string and output results as MeCab/Node.
 Parse given sentence and output N-best results as string. This method causes seg faults for me.
 ```php
 /**
- * @param       MeCab           $mecab          MeCab resource.
- * @param       int             $n              Number of results to obtain.
- * @param       string          $string         String to be parsed.
- * @param       int             $length         Length to be analyzed. (Optional)
- * @param       int             $output_length  Maximum length of output. (Optional)
+ * @param    . MeCab           $mecab       . MeCab resource.
+ * @param    . int             $n           . Number of results to obtain.
+ * @param    . string          $string      . String to be parsed.
+ * @param    . int             $length      . Length to be analyzed. (Optional)
+ * @param    . int             $output_lengt. Maximum length of output. (Optional)
  *
- * @return      string
+ * @return   . string
  */
 ```
 
@@ -1380,11 +1380,11 @@ Parse given sentence and output N-best results as string. This method causes seg
 Initialize N-best enumeration with a sentence.
 ```php
 /**
- * @param       MeCab           $mecab          MeCab resource.
- * @param       string          $string         String to be parsed.
- * @param       int             $length         Length to be analyzed. (Optional)
+ * @param    . MeCab           $mecab       . MeCab resource.
+ * @param    . string          $string      . String to be parsed.
+ * @param    . int             $length      . Length to be analyzed. (Optional)
 
- * @return      boolean
+ * @return   . boolean
  */
 ```
 
@@ -1392,10 +1392,10 @@ Initialize N-best enumeration with a sentence.
 Get the next result of N-Best as a string.
 ```php
 /**
- * @param       MeCab           $mecab          MeCab resource.
- * @param       int             $output_length  Maximum length of output. (Optional)
+ * @param    . MeCab           $mecab       . MeCab resource.
+ * @param    . int             $output_lengt. Maximum length of output. (Optional)
  *
- * @return      string
+ * @return   . string
  */
 ```
 
@@ -1403,9 +1403,9 @@ Get the next result of N-Best as a string.
 Get the next result of N-Best as a node.
 ```php
 /**
- * @param       MeCab           $mecab          MeCab resource.
+ * @param    . MeCab           $mecab       . MeCab resource.
  *
- * @return      MeCab\Node
+ * @return   . MeCab\Node
  */
 ```
 
@@ -1413,10 +1413,10 @@ Get the next result of N-Best as a node.
 Format a node to a string.
 ```php
 /**
- * @param       MeCab           $mecab          MeCab resource.
- * @param       MeCab\Node      $node           Node of source string.
+ * @param    . MeCab           $mecab       . MeCab resource.
+ * @param    . MeCab\Node      $node        . Node of source string.
  *
- * @return      string
+ * @return   . string
  */
 ```
 
@@ -1424,7 +1424,7 @@ Format a node to a string.
 Return array of dictionary info.
 ```php
 /**
- * @return      array
+ * @return   . array
  */
 ```
 
@@ -1432,10 +1432,10 @@ Return array of dictionary info.
 Get all elements of the node as an associative array.
 ```php
 /**
- * @param       MeCab\Node      $node           Node of source string.
- * @param       boolean         $dump_all       Dump all related nodes if true. (Optional)
+ * @param    . MeCab\Node      $node        . Node of source string.
+ * @param    . boolean         $dump_all    . Dump all related nodes if true. (Optional)
  *
- * @return      array
+ * @return   . array
  */
 ```
 
@@ -1443,9 +1443,9 @@ Get all elements of the node as an associative array.
 Get the formatted string of the node.
 ```php
 /**
- * @param       MeCab\Node      $node           Node of source string.
+ * @param    . MeCab\Node      $node        . Node of source string.
  *
- * @return      string
+ * @return   . string
  */
 ```
 
@@ -1453,9 +1453,9 @@ Get the formatted string of the node.
 Get the previous node. Return NULL if none.
 ```php
 /**
- * @param       MeCab\Node      $node           Node of source string.
+ * @param    . MeCab\Node      $node        . Node of source string.
  *
- * @return      MeCab\Node
+ * @return   . MeCab\Node
  */
 ```
 
@@ -1463,9 +1463,9 @@ Get the previous node. Return NULL if none.
 Get the next node. Return NULL if none.
 ```php
 /**
- * @param       MeCab\Node      $node           Node of source string.
+ * @param    . MeCab\Node      $node        . Node of source string.
  *
- * @return      MeCab\Node
+ * @return   . MeCab\Node
  */
 ```
 
@@ -1473,9 +1473,9 @@ Get the next node. Return NULL if none.
 Get the next node which has same end point as the given node. Return NULL if none.
 ```php
 /**
- * @param       MeCab\Node      $node           Node of source string.
+ * @param    . MeCab\Node      $node        . Node of source string.
  *
- * @return      MeCab\Node
+ * @return   . MeCab\Node
  */
 ```
 
@@ -1483,9 +1483,9 @@ Get the next node which has same end point as the given node. Return NULL if non
 Get the next node which has same beginning point as the given node. Return NULL if none.
 ```php
 /**
- * @param       MeCab\Node      $node           Node of source string.
+ * @param    . MeCab\Node      $node        . Node of source string.
  *
- * @return      MeCab\Node
+ * @return   . MeCab\Node
  */
 ```
 
@@ -1493,9 +1493,9 @@ Get the next node which has same beginning point as the given node. Return NULL 
 Get the next node which has same end point as the given node. Return NULL if none.
 ```php
 /**
- * @param       MeCab\Node      $node           Node of source string.
+ * @param    . MeCab\Node      $node        . Node of source string.
  *
- * @return      MeCab\Path
+ * @return   . MeCab\Path
  */
 ```
 
@@ -1503,9 +1503,9 @@ Get the next node which has same end point as the given node. Return NULL if non
 Get the next node which has same beginning point as the given node. Return NULL if none.
 ```php
 /**
- * @param       MeCab\Node      $node           Node of source string.
+ * @param    . MeCab\Node      $node        . Node of source string.
  *
- * @return      MeCab\Path
+ * @return   . MeCab\Path
  */
 ```
 
@@ -1513,9 +1513,9 @@ Get the next node which has same beginning point as the given node. Return NULL 
 Get the surface of the node.
 ```php
 /**
- * @param       MeCab\Node      $node           Node of source string.
+ * @param    . MeCab\Node      $node        . Node of source string.
  *
- * @return      string
+ * @return   . string
  */
 ```
 
@@ -1523,9 +1523,9 @@ Get the surface of the node.
 Get the feature of the node.
 ```php
 /**
- * @param       MeCab\Node      $node           Node of source string.
+ * @param    . MeCab\Node      $node        . Node of source string.
  *
- * @return      string
+ * @return   . string
  */
 ```
 
@@ -1533,9 +1533,9 @@ Get the feature of the node.
 Get the ID of the node.
 ```php
 /**
- * @param       MeCab\Node      $node           Node of source string.
+ * @param    . MeCab\Node      $node        . Node of source string.
  *
- * @return      int
+ * @return   . int
  */
 ```
 
@@ -1543,9 +1543,9 @@ Get the ID of the node.
 Get the length of the node's surface.
 ```php
 /**
- * @param       MeCab\Node      $node           Node of source string.
+ * @param    . MeCab\Node      $node        . Node of source string.
  *
- * @return      int
+ * @return   . int
  */
 ```
 
@@ -1553,9 +1553,9 @@ Get the length of the node's surface.
 Get the length of the node's surface including it's leading whitespace.
 ```php
 /**
- * @param       MeCab\Node      $node           Node of source string.
+ * @param    . MeCab\Node      $node        . Node of source string.
  *
- * @return      int
+ * @return   . int
  */
 ```
 
@@ -1563,9 +1563,9 @@ Get the length of the node's surface including it's leading whitespace.
 Get the ID of the right context.
 ```php
 /**
- * @param       MeCab\Node      $node           Node of source string.
+ * @param    . MeCab\Node      $node        . Node of source string.
  *
- * @return      int
+ * @return   . int
  */
 ```
 
@@ -1573,9 +1573,9 @@ Get the ID of the right context.
 Get the ID of the left context.
 ```php
 /**
- * @param       MeCab\Node      $node           Node of source string.
+ * @param    . MeCab\Node      $node        . Node of source string.
  *
- * @return      int
+ * @return   . int
  */
 ```
 
@@ -1583,9 +1583,9 @@ Get the ID of the left context.
 Get the ID of the part of speech.
 ```php
 /**
- * @param       MeCab\Node      $node           Node of source string.
+ * @param    . MeCab\Node      $node        . Node of source string.
  *
- * @return      int
+ * @return   . int
  */
 ```
 
@@ -1593,9 +1593,9 @@ Get the ID of the part of speech.
 Get the type of character.
 ```php
 /**
- * @param       MeCab\Node      $node           Node of source string.
+ * @param    . MeCab\Node      $node        . Node of source string.
  *
- * @return      int
+ * @return   . int
  */
 ```
 
@@ -1603,9 +1603,9 @@ Get the type of character.
 Get the status of the node.
 ```php
 /**
- * @param       MeCab\Node      $node           Node of source string.
+ * @param    . MeCab\Node      $node        . Node of source string.
  *
- * @return      int
+ * @return   . int
  */
 ```
 0: Normal, MECAB_NOR_NODE
@@ -1617,9 +1617,9 @@ Get the status of the node.
 Get the forward log probability.
 ```php
 /**
- * @param       MeCab\Node      $node           Node of source string.
+ * @param    . MeCab\Node      $node        . Node of source string.
  *
- * @return      float
+ * @return   . float
  */
 ```
 
@@ -1627,9 +1627,9 @@ Get the forward log probability.
 Get the backward probability log.
 ```php
 /**
- * @param       MeCab\Node      $node           Node of source string.
+ * @param    . MeCab\Node      $node        . Node of source string.
  *
- * @return      float
+ * @return   . float
  */
 ```
 
@@ -1637,9 +1637,9 @@ Get the backward probability log.
 Get the word arising cost.
 ```php
 /**
- * @param       MeCab\Node      $node           Node of source string.
+ * @param    . MeCab\Node      $node        . Node of source string.
  *
- * @return      int
+ * @return   . int
  */
 ```
 
@@ -1647,9 +1647,9 @@ Get the word arising cost.
 Get the cumulative cost of the node.
 ```php
 /**
- * @param       MeCab\Node      $node           Node of source string.
+ * @param    . MeCab\Node      $node        . Node of source string.
  *
- * @return      int
+ * @return   . int
  */
 ```
 
@@ -1657,9 +1657,9 @@ Get the cumulative cost of the node.
 Get the marginal probability of the node.
 ```php
 /**
- * @param       MeCab\Node      $node           Node of source string.
+ * @param    . MeCab\Node      $node        . Node of source string.
  *
- * @return      float
+ * @return   . float
  */
 ```
 
@@ -1667,9 +1667,9 @@ Get the marginal probability of the node.
 Determine whether the node is the best solution.
 ```php
 /**
- * @param       MeCab\Node      $node           Node of source string.
+ * @param    . MeCab\Node      $node        . Node of source string.
  *
- * @return      boolean
+ * @return   . boolean
  */
 ```
 
@@ -1677,9 +1677,9 @@ Determine whether the node is the best solution.
 Get the rnext path. Return NULL if none.
 ```php
 /**
- * @param       MeCab\Path      $path           Path of source string.
+ * @param    . MeCab\Path      $path        . Path of source string.
  *
- * @return      MeCab\Path
+ * @return   . MeCab\Path
  */
 ```
 
@@ -1687,9 +1687,9 @@ Get the rnext path. Return NULL if none.
 Get the lext path. Return NULL if none.
 ```php
 /**
- * @param       MeCab\Path      $path           Path of source string.
+ * @param    . MeCab\Path      $path        . Path of source string.
  *
- * @return      MeCab\Path
+ * @return   . MeCab\Path
  */
 ```
 
@@ -1697,9 +1697,9 @@ Get the lext path. Return NULL if none.
 Get the rnode. Return NULL if none.
 ```php
 /**
- * @param       MeCab\Path      $path           Path of source string.
+ * @param    . MeCab\Path      $path        . Path of source string.
  *
- * @return      MeCab\Node
+ * @return   . MeCab\Node
  */
 ```
 
@@ -1707,9 +1707,9 @@ Get the rnode. Return NULL if none.
 Get the lnode. Return NULL if none.
 ```php
 /**
- * @param       MeCab\Path      $path           Path of source string.
+ * @param    . MeCab\Path      $path        . Path of source string.
  *
- * @return      MeCab\Node
+ * @return   . MeCab\Node
  */
 ```
 
@@ -1717,9 +1717,9 @@ Get the lnode. Return NULL if none.
 Get the marginal probability of the path.
 ```php
 /**
- * @param       MeCab\Path      $path           Path of source string.
+ * @param    . MeCab\Path      $path        . Path of source string.
  *
- * @return      float
+ * @return   . float
  */
 ```
 
@@ -1727,9 +1727,9 @@ Get the marginal probability of the path.
 Get the cumulative cost of the path.
 ```php
 /**
- * @param       MeCab\Path      $path           Path of source string.
+ * @param    . MeCab\Path      $path        . Path of source string.
  *
- * @return      int
+ * @return   . int
  */
 ```
 
@@ -1756,4 +1756,4 @@ If an app your using requires php-mecab and you'd like to use Travis CI, check o
 [Top](#contents)
 
 ## Contributing
-Please help me to improve this guide.  If you find errors or places where you feel this guide is lacking, please create an issue or make a pull request.  Also, I would love to see this guide translated into other languages, especially Japanese.  Any help with translations would be much appreciated.
+Please help me to improve this guide. If you find errors or places where you feel this guide is lacking, please create an issue or make a pull request. Also, I would love to see this guide translated into other languages, especially Japanese. Any help with translations would be much appreciated.
